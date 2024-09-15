@@ -1,0 +1,43 @@
+{
+  "expo": {
+    "name": "Plano de Saúde",
+    "slug": "snack-6bc4847f-cafe-4021-b372-e585f14f170e",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "platforms": ["ios", "android"],
+    "userInterfaceStyle": "automatic",
+    "icon": "./assets/icon.png",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.anderson_tome.snack6bc4847fcafe4021b372e585f14f170e"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "6cd97fe4-6a7b-498c-b776-ae08637d2a61"
+      }
+    },
+    "plugins": [
+      [
+        "expo-local-authentication",
+        {
+          "faceIDPermissionPrompt": "Allow $(PRODUCT_NAME) to use Face ID"
+        }
+      ]
+    ]
+  }
+}
