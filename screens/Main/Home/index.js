@@ -1,25 +1,27 @@
+// src/screens/MainScreen/index.js
 import React, { useEffect } from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, Switch } from 'react-native';
 import * as ScreenOrientation from 'expo-screen-orientation';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
-import { styles } from './Styles';
+import { getStyles } from './Styles';
 import Rodape from '../../../components/Rodape';
 import LogoSVG from '../../../components/LogoSVG';
 import Login from '../../LoginScreen/index';
 import Planos from '../ScreenTabs/PlanosTabs/index';
 import Noticias from '../ScreenTabs/NoticiasTabs/index';
 import RedeCredenciada from '../ScreenTabs/RedeCredenciadaTabs/index';
+import { useTheme } from '../../../context/ThemeContext';
 
 const Tab = createMaterialTopTabNavigator();
 
 const App = ({ navigation }) => {
-  useEffect(() => {
-    // Lock screen orientation to PORTRAIT_UP
-    ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT_UP);
+  const { theme, toggleTheme, isNightMode } = useTheme();
+  const styles = getStyles(theme);
 
+  useEffect(() => {
+    ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT_UP);
     return () => {
-      // Unlock screen orientation when component unmounts
-      // ScreenOrientation.unlockAsync();
+      // ScreenOrientation.unlockAsync(); // Uncomment if needed
     };
   }, []);
 
@@ -28,11 +30,14 @@ const App = ({ navigation }) => {
       <View style={styles.navcontent}>
         <View style={styles.homenavBar}>
           <View style={styles.navRow}>
-            <View style={{ alignItems: 'center', marginTop: 80 }}>
-              <LogoSVG />
-              <Text style={{ textAlign: 'center' }}>Bem vindo ao Login do Portal do Beneficiário</Text>
+            <View style={{ alignItems: 'center', marginTop: 70 }}>
+              <LogoSVG width={150} height={50} />
+              <Text style={styles.welcomeText}>
+                Bem vindo ao Login do Portal do Beneficiário
+              </Text>
             </View>
           </View>
+
           <Login navigation={navigation} />
           <Tab.Navigator
             screenOptions={({ route }) => ({
@@ -52,17 +57,30 @@ const App = ({ navigation }) => {
                     break;
                 }
                 return (
-                  <Text style={{ fontSize: 13, color: focused ? '#00BFFF' : 'black' }}>{label}</Text>
+                  <Text
+                    style={{
+                      fontSize: 13,
+                      color: focused
+                        ? theme.tabBarActiveTextColor
+                        : theme.tabBarTextColor,
+                    }}
+                  >
+                    {label}
+                  </Text>
                 );
               },
-              tabStyle: { width: 135 },
-              style: { backgroundColor: 'white' },
-              indicatorStyle: { backgroundColor: '#00BFFF' },
+              tabBarStyle: {
+                backgroundColor: theme.tabBarBackground,
+              },
+              tabBarIndicatorStyle: {
+                backgroundColor: theme.tabBarIndicatorColor,
+              },
+              tabBarItemStyle: { width: 135 },
             })}
           >
-            <Tab.Screen name='Planos' component={Planos} />
-            <Tab.Screen name='Noticias' component={Noticias} />
-            <Tab.Screen name='Rede Credenciada' component={RedeCredenciada} />
+            <Tab.Screen name="Planos" component={Planos} />
+            <Tab.Screen name="Noticias" component={Noticias} />
+            <Tab.Screen name="Rede Credenciada" component={RedeCredenciada} />
           </Tab.Navigator>
         </View>
       </View>

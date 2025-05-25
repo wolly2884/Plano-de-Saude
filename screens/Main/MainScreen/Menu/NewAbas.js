@@ -1,10 +1,9 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import Icon from 'react-native-vector-icons/Ionicons'; 
-import { View } from 'react-native';
-
-
-//import Experiencia from './src/pages/Experiencia/app';
+import Icon from 'react-native-vector-icons/Ionicons';
+import { View, ActivityIndicator } from 'react-native';
+import { useTheme } from '../../../../context/ThemeContext';
+import { getStyles } from './ModalStyles';
 import Home from './Home';
 import Atendimento from './Atendimento';
 import Financeiro from './Financeiro';
@@ -29,47 +28,27 @@ const TabBarIcon = ({ focused, name, color }) => {
 };
 
 const App = () => {
+  const { theme, isThemeLoaded } = useTheme();
+  const styles = getStyles(theme);
+
   return (
-    <View style={{flex: 1}}>
-    <Tab.Navigator
-      screenOptions={({ route }) => ({
-        tabBarIcon: ({ focused, color, size }) => (
-          <TabBarIcon focused={focused} name={route.name} color={color} />
-        ),
-        tabBarLabelStyle:{
-          fontSize: 16, // Defina o tamanho da fonte aqui
-          fontWeight: 'bold', // Opcional, adicione caso queira negrito
-          fontStyle: 'italic',
-          bottom: 10,
-        },
-        tabBarStyle: {
-          height: 70,
-          top: -20,
-        },
-        tabBarActiveTintColor: 'red',
-        tabBarActiveBackgroundColor: "rgba(0, 0, 0, 0.1)",
-        swipeEnabled: false,
-        headerMode: 'float',
-      })}
-      
-    >
-      <Tab.Screen name="Home" options={{headerShown: false }}>
-        {props => <Home {...props}  navigation={props.navigation} />}
-      </Tab.Screen>
-
-      <Tab.Screen name="Atendimento"  options={{ headerShown: false }}>
-        {props => <Atendimento {...props}  navigation={props.navigation} />}
-      </Tab.Screen>
-
-      <Tab.Screen name="Financeiro"  options={{ headerShown: false }}>
-        {props => <Financeiro {...props}  navigation={props.navigation} />}
-      </Tab.Screen>
-
-      <Tab.Screen name="Settings"  options={{ headerShown: false }}>
-        {props => <Settings {...props}  navigation={props.navigation} />}
-      </Tab.Screen>
-      
-    </Tab.Navigator>
+    <View style={styles.inicontainer}>
+      <Tab.Navigator
+        screenOptions={({ route }) => ({
+          tabBarIcon: ({ focused, color }) => (
+            <TabBarIcon focused={focused} name={route.name} color={color} />
+          ),
+          tabBarLabelStyle: styles.tabBarLabelStyle,
+          tabBarStyle: styles.tabBarStyle,
+          tabBarActiveTintColor: styles.tabBarActiveTintColor, // Dynamic value
+          tabBarActiveBackgroundColor: styles.tabBarActiveBackgroundColor, // Dynamic value
+        })}
+      >
+        <Tab.Screen name="Home" options={{ headerShown: false }} component={Home} />
+        <Tab.Screen name="Atendimento" options={{ headerShown: false }} component={Atendimento} />
+        <Tab.Screen name="Financeiro" options={{ headerShown: false }} component={Financeiro} />
+        <Tab.Screen name="Settings" options={{ headerShown: false }} component={Settings} />
+      </Tab.Navigator>
     </View>
   );
 };

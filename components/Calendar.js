@@ -3,15 +3,16 @@ import { StyleSheet, Text, View, ScrollView } from 'react-native'
 import moment from 'moment';
 import 'moment/locale/pt-br';
 import Date from './date'
-
+import './calendarLocale'; // Caminho relativo conforme seu projeto
 
 moment.locale('pt-br');
+
 const Calendar = ({ onSelectDate, selected }) => {
   const [dates, setDates] = useState([])
   const [scrollPosition, setScrollPosition] = useState(0)
   const [currentMonth, setCurrentMonth] = useState()
 
-    const getCurrentMonth = () => {
+  const getCurrentMonth = () => {
     const month = moment(dates[0]).add(scrollPosition / 60, 'days').format('MMMM')
     setCurrentMonth(month)
   }
@@ -68,8 +69,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   title: {
-    fontSize: 20,
+    fontSize: 25,
     fontWeight: 'bold',
+    fontVariant: 'small-caps',
+    fontStyle: 'italic',
+    top: 20
   },
   dateSection: {
     width: '100%',

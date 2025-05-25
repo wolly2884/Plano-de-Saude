@@ -1,5 +1,8 @@
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native'
 import moment from 'moment'
+import 'moment/locale/pt-br'
+import './calendarLocale'; // Caminho relativo conforme seu projeto
+moment.locale('pt-br');
 
 const Date = ({ date, onSelectDate, selected }) => {
 

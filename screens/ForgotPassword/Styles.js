@@ -4,7 +4,6 @@ export const styles = StyleSheet.create({
   //Recupera senha
   Senhacontainer: {
     flex: 1,
-    backgroundColor: '#fff',
     padding: 20,
   },
   Senhainput: {
@@ -13,12 +12,18 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 15,
     paddingVertical: 10,
   },
+  lenerror: {
+    color: 'red' ,
+    fontSize: 11,
+    top: -1,
+    left: 10,
+  },
   Senhabutton: {
     backgroundColor: '#0d729c',
     borderRadius: 5,
     padding: 15,
     alignItems: 'center',
-    marginTop: 20,
+    marginTop: 50,
   },
   SenhabuttonText: {
     color: '#fff',

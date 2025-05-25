@@ -1,12 +1,17 @@
 import React from 'react';
 import { View, Text } from 'react-native';
 import Botao from '../../../../components/BotaoMenu';
-import {styles} from './styles'
-
+import {getStyles} from './ModalStyles'
+import { useTheme } from '../../../../context/ThemeContext'; // 👈 Integração com ThemeContext
 
 const Menu = ({ navigation }) => { 
+  const { theme, isThemeLoaded } = useTheme();
+  const styles = getStyles(theme);
+  
   return (
-    <View style={styles.container}>
+
+    <View style={styles.inicontainer}>
+      <View style={styles.container}>
       <Text style={styles.title}>O que você precisa hoje:</Text>
       
       <View style={styles.rowContainer}  >
@@ -16,9 +21,10 @@ const Menu = ({ navigation }) => {
       </View>
 
       <View style={styles.rowContainer2}  >
-        <Botao  text={'Geração Imposto Renda'}   nav={'Imposto de Renda'}          image={require('../../../../assets/src/IRPF.png')}  />
+        <Botao  text={'Imposto Renda'}           nav={'Imposto de Renda'}          image={require('../../../../assets/src/IRPF.png')}  />
         <Botao  text={'2ª do Boleto'}            nav={'Via Boleto'}                image={require('../../../../assets/src/boleto.png')} />
       </View>
+    </View>
     </View>
   );
 };

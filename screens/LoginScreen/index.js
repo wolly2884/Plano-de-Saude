@@ -1,42 +1,48 @@
 import React, { useState } from 'react';
-import {View, Text, TextInput, TouchableOpacity, Alert, Platform } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Alert, Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { cpf } from 'cpf-cnpj-validator'; 
-import {styles} from './Styles'
+import { cpf } from 'cpf-cnpj-validator';
+import { styles } from './Styles';
 import api from '../../api/api';
+import Modal from 'react-native-modal';
 
 const App = ({ navigation }) => {
   const [login, setLogin] = useState('');
   const [password, setPassword] = useState('');
-  const [storedCPF, setstoredCPF] = useState('')
-  const [storedEmail, setstoredEmail] = useState('')
-  const [storedPassword, setstoredPassword] = useState('')
+  const [storedCPF, setstoredCPF] = useState('');
+  const [storedEmail, setstoredEmail] = useState('');
+  const [storedPassword, setstoredPassword] = useState('');
+  const [isModalVisible, setIsModalVisible] = useState(false);
 
   const handleLogin = async () => {
-
-    try {    
+    try {
       if ((login === storedCPF && password === storedPassword) || (login === storedEmail && password === storedPassword) || Platform.OS === 'web') {
-        navigation.navigate('pagina');
+        // Verifica se o modal deve ser exibido
+        const biometricFlag = await AsyncStorage.getItem('biometricConfigured');
+        
+        if (biometricFlag !== null && !biometricFlag) {
+          setIsModalVisible(true);
+        } else {
+          navigation.navigate('pagina');
+        }
       } else {
         Alert.alert('Credenciais inválidas');
-      } 
-
-      } catch (error) {
-        console.error('Erro ao recuperar ou armazenar os dados:', error);
-        Alert.alert('Erro', 'Não foi possível realizar o login. Tente novamente.', [
-          { text: 'OK' },
-            ]);
       }
+    } catch (error) {
+      console.error('Erro ao recuperar ou armazenar os dados:', error);
+      Alert.alert('Erro', 'Não foi possível realizar o login. Tente novamente.', [
+        { text: 'OK' },
+      ]);
+    }
   };
 
-  const validateLogin = async () => {  
+  const validateLogin = async () => {
     if (validCPF() || validEmail()) {
-      
-      let userData = await api.get('Beneficiario/find/' + login );
-      
+      let userData = await api.get('Beneficiario/find/' + login);
+
       const sCPF = userData.data.rows[0].cd_cpf;
-      setstoredCPF(sCPF);  
-      
+      setstoredCPF(sCPF);
+
       const sEmail = userData.data.rows[0].ds_email;
       setstoredEmail(sEmail);
 
@@ -51,16 +57,17 @@ const App = ({ navigation }) => {
       const sID         = userData.data.rows[0].id.toString();
 
       //await AsyncStorage.clear();
-      await AsyncStorage.setItem('CPF'        , sCPF);
-      await AsyncStorage.setItem('age'        , sAge);
-      await AsyncStorage.setItem('cardNumber' , sCardNumber);
-      await AsyncStorage.setItem('healthPlan' , sHealthPlan);
-      await AsyncStorage.setItem('username'   , sNome);
-      await AsyncStorage.setItem('CNS'        , sCNS);
-      await AsyncStorage.setItem('ID'         , sID);
+      await AsyncStorage.setItem('CPF', sCPF);
+      await AsyncStorage.setItem('age', sAge);
+      await AsyncStorage.setItem('cardNumber', sCardNumber);
+      await AsyncStorage.setItem('healthPlan', sHealthPlan);
+      await AsyncStorage.setItem('username', sNome);
+      await AsyncStorage.setItem('CNS', sCNS);
+      await AsyncStorage.setItem('ID', sID);
+      await AsyncStorage.setItem('Email', sEmail);
 
       return true;
-    } else if (login.length != 0 ) {
+    } else if (login.length !== 0) {
       Alert.alert('Erro', 'Login inválido.');
       return false;
     }
@@ -75,19 +82,20 @@ const App = ({ navigation }) => {
     }
     return false;
   };
-  
+
   const validEmail = () => {
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    if (emailRegex.test(login)){
+    if (emailRegex.test(login)) {
       setLogin(login);
       return true;
     }
     return false;
   };
 
-  const handleLoginPress = () => {
+  const handleLoginPress = async () => {
     if (login.trim() !== '' && password.trim() !== '') { // Check if login and password are not empty
-      if (validateLogin()) {
+      const isValid = await validateLogin();
+      if (isValid) {
         handleLogin();
       }
     } else {
@@ -95,11 +103,22 @@ const App = ({ navigation }) => {
     }
   };
 
+  const handleModalConfirm = async () => {
+    await AsyncStorage.setItem('biometricConfigured', 'true');
+    setIsModalVisible(false);
+    navigation.navigate('pagina');
+  };
+
+  const handleModalCancel = () => {
+    setIsModalVisible(false);
+    navigation.navigate('pagina');
+  };
+
   return (
     <View style={styles.loginsearchBar}>
       <TextInput style={styles.logininput} placeholder="Insira seu E-mail ou CPF" value={login} onChangeText={setLogin} onBlur={validateLogin} />
       <TextInput style={styles.logininput} placeholder="Insira sua senha" secureTextEntry value={password} onChangeText={setPassword} />
-      
+
       <TouchableOpacity style={styles.loginnavBar} onPress={handleLoginPress}>
         <Text style={styles.loginnavItem}>Entrar</Text>
       </TouchableOpacity>
@@ -111,6 +130,19 @@ const App = ({ navigation }) => {
       <TouchableOpacity onPress={() => navigation.navigate('Cadastro')}>
         <Text style={styles.loginTexto}>Ainda não tem uma conta? Registre-se aqui.</Text>
       </TouchableOpacity>
+
+      {/* Modal de confirmação */}
+      <Modal isVisible={isModalVisible} backdropOpacity={1.5}>
+        <View style={styles.modalContainer}>
+          <Text style={styles.modalText}>Deseja ativar o uso da biometria para login futuro?</Text>
+          <TouchableOpacity style={styles.modalButton} onPress={handleModalConfirm}>
+            <Text style={styles.modalButtonText}>Sim</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.modalButton} onPress={handleModalCancel}>
+            <Text style={styles.modalButtonText}>Não</Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
     </View>
   );
 };

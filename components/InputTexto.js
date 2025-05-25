@@ -1,36 +1,69 @@
 import React from 'react';
-import { View } from 'react-native';
+import { View, TouchableOpacity } from 'react-native';
 import { TextInput } from 'react-native-paper';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { useTheme } from '../context/ThemeContext';
 
-const App = ({
-  text = "Default Text", // Parâmetro padrão
-  value = "", // Parâmetro padrão
-  funcao = () => {}, // Parâmetro padrão
-  istrue = false, // Parâmetro padrão
-  max = 255, // Parâmetro padrão
-  teclado = "default", // Parâmetro padrão
-  editar = true, // Parâmetro padrão
-  icon = "pencil", // Parâmetro padrão
-  onlong = () => {} // Parâmetro padrão
+const InputTexto = ({
+  text = "Default Text",
+  value = "",
+  funcao = () => {},
+  istrue = false,
+  max = 255,
+  teclado = "default",
+  editar = true,
+  icon = "pencil",
+  onlong = () => {},
+  redicon = false,
+  style = {},
+  multiline = false,
+  numberOfLines = 5,
 }) => {
+    const { theme, isThemeLoaded } = useTheme();
+
   return (
-    <View style={{ flex: 1, top: 10, paddingBottom: 11 }}>
+    <View style={{ marginBottom: 15 }}>
       <TextInput
         placeholder={`Entre com ${text}`}
-        underlineColor="white"
-        secureTextEntry={istrue}
         value={value}
         onChangeText={funcao}
+        secureTextEntry={istrue}
         maxLength={max}
         keyboardType={teclado}
-        autoCorrect={true}
         editable={editar}
-        mode='outlined'
+        autoCorrect={true}
+        mode="outlined"
         label={text}
-        left={<TextInput.Icon icon={icon} onPress={onlong} />}
+        textColor={theme.textColor}
+        underlineColor="transparent"
+        activeOutlineColor="white"
+        multiline={multiline}
+        numberOfLines={multiline ? numberOfLines : 1}
+        outlineColor="#666"
+        style={[{ backgroundColor: 'black' }, style]}
+        theme={{
+          colors: {
+            text: theme.textColor,
+            placeholder: theme.textColor,
+            primary: theme.textColor,
+          },
+        }}
+        left={
+          <TextInput.Icon
+            name={() => (
+              <TouchableOpacity onPress={onlong}>
+                <MaterialCommunityIcons
+                  name={icon}
+                  size={24}
+                  color={redicon ? 'red' : 'gray'}
+                />
+              </TouchableOpacity>
+            )}
+          />
+        }
       />
     </View>
   );
 };
 
-export default App;
+export default InputTexto;

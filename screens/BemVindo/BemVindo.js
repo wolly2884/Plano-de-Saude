@@ -8,31 +8,33 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 function BemVindo({ navigation }) {
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const image = require('../../assets/totvs.gif');
 
   useFocusEffect(
     React.useCallback(() => {
       const checkTokenAndAuthenticate = async () => {
         try {
-          // Verifica se há um token salvo no AsyncStorage
           const savedToken = await AsyncStorage.getItem('ID');
-          
-          if (savedToken) {
-            // Se o token existir, autentica com biometria
-            await authenticateUser();
+          const biometricFlag = await AsyncStorage.getItem('biometricConfigured');
+          console.log("Token salvo: ", savedToken);
+          console.log("Biometria configurada: ", biometricFlag);
+
+          if (savedToken !== null) {
+            if (biometricFlag === 'true') { // Verifica se a biometria está ativa
+              await authenticateUser(savedToken); // Autentica o usuário
+            } else {
+              navigation.navigate('Home'); // Se biometria não está ativa, vai para Home
+            }
           } else {
-            // Se não existir token, segue para carregar os dados e navega diretamente
-            await fetchData();
+            await fetchData(); // Se não há token salvo, busca dados
           }
         } catch (e) {
           console.error("Erro ao buscar token:", e);
-          // Navega para a tela de senha em caso de erro ao buscar o token
           navigation.navigate('Home');
         }
       };
 
-      const authenticateUser = async () => {
+      const authenticateUser = async (savedToken) => {
         try {
           const isCompatible = await LocalAuthentication.hasHardwareAsync();
 
@@ -47,19 +49,27 @@ function BemVindo({ navigation }) {
 
           const biometricAuth = await LocalAuthentication.authenticateAsync({
             promptMessage: 'Autentique-se para continuar',
-            fallbackLabel: 'Use sua senha'
+            fallbackLabel: 'Use sua senha',
+            cancelLabel: 'Cancelar',
+            requireConfirmation: true,
+            biometricsSecurityLevel: 'strong',
+            disableDeviceFallback: true,
           });
 
           if (biometricAuth.success) {
-            // Autenticação bem-sucedida, navega para a página principal
-            navigation.navigate('pagina');
+            await AsyncStorage.setItem('biometricConfigured', 'true');
+            navigation.navigate('pagina'); // Usuário autenticado, navega para a próxima página
+          } else if (biometricAuth.error === 'user_cancel') {
+            console.log('Autenticação biométrica cancelada pelo usuário.');
+            await AsyncStorage.removeItem('biometricConfigured'); // Removendo a chave corretamente
+            navigation.navigate('Home');
           } else {
             throw new Error('Autenticação biométrica falhou.');
           }
         } catch (error) {
           console.error("Erro na autenticação biométrica:", error);
           Alert.alert('Erro de Autenticação', error.message);
-          // Navega para a tela de senha em caso de erro na autenticação
+          await AsyncStorage.removeItem('biometricConfigured'); // Removendo a chave corretamente
           navigation.navigate('Home');
         } finally {
           setLoading(false);
@@ -69,19 +79,16 @@ function BemVindo({ navigation }) {
       const fetchData = async () => {
         try {
           const response = await api.get('/Protected');
-          //console.log(response.data); // Manipule os dados da resposta conforme necessário
-          // Supondo que a navegação para 'Home' seja apropriada após a obtenção dos dados
+          await AsyncStorage.setItem('biometricConfigured', 'false'); // Define que a biometria não está configurada
           navigation.navigate('Home');
         } catch (error) {
           console.error("Erro ao buscar dados protegidos:", error);
-          // Navega para a tela de senha em caso de erro na requisição
           navigation.navigate('Home');
         } finally {
           setLoading(false);
         }
       };
 
-      // Inicia o processo de verificação e autenticação
       checkTokenAndAuthenticate();
     }, [navigation])
   );
@@ -98,8 +105,7 @@ function BemVindo({ navigation }) {
     );
   }
 
-  // A renderização do erro não é mais necessária, pois em caso de erro o usuário será redirecionado para a tela de senha
-  return null; // Não renderiza nada caso a navegação ocorra
+  return null;
 }
 
 const styles = StyleSheet.create({
@@ -120,7 +126,7 @@ const styles = StyleSheet.create({
   errorText: {
     color: 'red',
     fontSize: 18,
-  }
+  },
 });
 
 export default BemVindo;

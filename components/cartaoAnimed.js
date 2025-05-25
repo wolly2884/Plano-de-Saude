@@ -1,27 +1,40 @@
-import React, { useState, useEffect } from 'react';
-import { View, Animated } from 'react-native';
+import React, { useState, useRef } from 'react';
+import { View, FlatList, Animated } from 'react-native';
 import Screen from './Cartao';
+
+const AnimatedFlatList = Animated.createAnimatedComponent(FlatList);
 
 const App = ({items, navigation}) => {
   const [xOffset] = useState(new Animated.Value(0));
-  const itemLength = items.length;
+  const flatListRef = useRef(null);
+
+  const renderItem = ({ item, index }) => (
+    <Screen 
+      items={item} 
+      index={index} 
+      xOffset={xOffset} 
+      navigation={navigation} 
+      tamarray={items.length} 
+    />
+  );
+
+  const keyExtractor = (item, index) => index.toString();
+
   return (
-    <Animated.ScrollView
+    <AnimatedFlatList
+      ref={flatListRef}
+      data={items}
+      renderItem={renderItem}
+      keyExtractor={keyExtractor}
+      horizontal
+      pagingEnabled
       scrollEventThrottle={16}
       onScroll={Animated.event(
         [{ nativeEvent: { contentOffset: { x: xOffset } } }],
-        { useNativeDriver: false }
+        { useNativeDriver: true } 
       )}
-      horizontal
-      pagingEnabled
       style={{ flex: 1, top: 100 }}
-    >
-      {items.map((item, index) => (
-        <View key={index} style={{ flex: 1 }}>
-          <Screen items={item} index={index} xOffset={xOffset} navigation={navigation} tamarray={itemLength}/>
-        </View>
-      ))}
-    </Animated.ScrollView>
+    />
   );
 };
 

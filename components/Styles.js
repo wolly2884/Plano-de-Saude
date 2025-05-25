@@ -52,8 +52,8 @@ export const styles = StyleSheet.create({
   },
   input: {
     backgroundColor: '#ceeaf2',
-    marginTop: 20,
-    paddingHorizontal: 15,
+    marginTop: 1,
+    paddingHorizontal: 1,
     paddingVertical: 10,
     borderRadius: 5,
   },

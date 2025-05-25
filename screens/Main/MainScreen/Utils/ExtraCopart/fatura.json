@@ -1,0 +1,33 @@
+{
+    "faturas": [
+      {
+        "id": "1234",
+        "mes": "Jul",
+        "cartao": {
+          "bandeira": "Visa",
+          "final": "0000"
+        },
+        "valor_total": 1350.40,
+        "valor_minimo": 300.00,
+        "vencimento": "01/07/2025",
+        "status": "A fatura está fechada",
+        "titular": "Gustavo J Freitas",
+        "detalhes": "Confira aqui os detalhes da fatura e os lançamentos do mês."
+      },
+      {
+        "id": "1235",
+        "mes": "Jun",
+        "cartao": {
+          "bandeira": "Visa",
+          "final": "0000"
+        },
+        "valor_total": 980.50,
+        "valor_minimo": 200.00,
+        "vencimento": "01/06/2025",
+        "status": "A fatura está fechada",
+        "titular": "Gustavo J Freitas",
+        "detalhes": "Confira aqui os detalhes da fatura e os lançamentos do mês."
+      }
+    ],
+    "meses": ["Mai", "Jun", "Jul", "Ago", "Set"]
+  }
