@@ -57,7 +57,7 @@ const App = () => {
         <MenuProvider style={{ backgroundColor: '#fff' }}>
           <Stack.Navigator>
             
-            <Stack.Screen name="Bem-Vindo"              component={BemVindo}            options={{ headerShown: false }} />
+            <Stack.Screen name="Bem-Vindo"              component={Pages}            options={{ headerShown: false }} />
             <Stack.Screen name="Home"                   component={Home}                options={{ headerShown: false }} />
             <Stack.Screen name="login"                  component={Login}               options={{ headerShown: false }} />
             <Stack.Screen name="pagina"                 component={Pages}               options={{ headerShown: false }} />

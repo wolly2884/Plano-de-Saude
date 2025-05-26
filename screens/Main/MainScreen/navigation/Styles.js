@@ -1,4 +1,5 @@
 import { StyleSheet, Dimensions } from 'react-native';
+import { heightPercentageToDP as hp, widthPercentageToDP as wp } from 'react-native-responsive-screen';
 
 export const getStyles = (theme) =>
   StyleSheet.create({
@@ -10,21 +11,25 @@ export const getStyles = (theme) =>
     paddingLeft: 5,
     flexDirection: 'row',
     width: '98%',
-    height: '25%',
+    height: '24%',
     marginLeft: 20,
     marginRight: 20,
   },
   image: {
-    width: 75,
-    height: 70,
+    width: hp('9%'), // 15% of screen height
+    height: hp('9%'), // 15% of screen height
     borderRadius: 200,
     alignSelf: 'center',
-    left: 10,
-    top: 15
+    left: hp('1%'),
+    top: hp('1%'),
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   userInfo: {
-    marginLeft: 20,
-    top: 15,
+    marginLeft: hp('2%'),
+    alignItems: 'flex-start',
+    top: hp('2%'),
+    width: '50%',
     justifyContent: 'space-around',
   },
   buttonsContainer: {
@@ -32,9 +37,15 @@ export const getStyles = (theme) =>
     flexDirection: 'row',
     borderBottomLeftRadius: 10,
     borderBottomRightRadius: 10,
-    height: 35,
+    height: hp('10%'),
     position: 'relative',
-    
+  },
+  cartaoinfo: { 
+    borderTopStartRadius: 10, 
+    borderTopEndRadius: 10, 
+    width: '100%', 
+    height: hp('21%'), 
+    borderWidth: 0 
   },
   button1: {
     justifyContent: 'center',
@@ -42,11 +53,11 @@ export const getStyles = (theme) =>
     borderWidth: 1,
     borderColor: 'black',
     borderBottomLeftRadius: 10,
-    marginLeft: -10,
+    marginLeft: hp('-1%'),
     width: '50.4%',
-    height: 45,
-    top: 30, 
-    left: 9,
+    height: '58%',
+    top: hp('4.5%'), 
+    left: hp('1%'),
     backgroundColor: '#D3D3D3',
 
   },
@@ -55,11 +66,11 @@ export const getStyles = (theme) =>
     alignItems: 'center',
     borderWidth: 1,
     borderBottomRightRadius: 10,
-    marginRight: 20,
+    marginRight: hp('4%'),
     width: '50.4%',
-    height: 45,
-    top: 30, 
-    left: 9,
+    height: '58%',
+    top: hp('4.5%'), 
+    left: hp('0.6%'),
     backgroundColor: '#D3D3D3',
   },
   buttonText: {
@@ -69,10 +80,11 @@ export const getStyles = (theme) =>
   },
   centro: {
     width: '100%',
-    height: '56%',
+    height: '55%',
     left: 0 ,
-    bottom: -10,
+    bottom: -20,
     right:0,
+    position: 'absolute',
   },
  footer: {
     position: 'absolute',
@@ -89,13 +101,13 @@ export const getStyles = (theme) =>
     color: '#fff',
   },
   TextoCard:{ 
-    fontSize: 20, 
+    fontSize: hp('2.2%'), 
     fontStyle: 'italic', 
     fontWeight: 'bold', 
     color: 'black' 
   },
   TextoBenef:{
-    fontSize: 15, 
+    fontSize: hp('1.5%'), 
     fontStyle: 'italic', 
     color: 'black', 
     padding: 5
@@ -108,12 +120,11 @@ export const getStyles = (theme) =>
     flex: 1,     
   },
   screen: {
-    height: '45%',
+    height: '24%',
     width: '97%',
     borderRadius: 10,
     right: 10,
     backgroundColor: 'white'
-
   },
 
 });

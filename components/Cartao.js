@@ -119,7 +119,7 @@ const Screen = ({ items, index, navigation, xOffset, tamarray }) => {
   return (
     <View style={[styles.scrollPage, { left: index === tamarray - 1 && tamarray > 1 ? 12 : 19 + (index * 8), width: SCREEN_WIDTH, top: 10 }]}>
       <Animated.View style={[styles.screen, transitionAnimation]}>
-        <SafeAreaView style={{ borderTopStartRadius: 10, borderTopEndRadius: 10, width: '100%', height: height * 0.185, borderWidth: 1 }}>
+        <SafeAreaView style={styles.cartaoinfo}>
           <View style={{ flexDirection: 'row', top: isTablet ? 50 : 5 }}>
             <TouchableOpacity onPress={showImagePickerOptions} style={{ top: 20 }}>
               <Image source={imageSource} style={styles.image} />
@@ -149,20 +149,12 @@ const Screen = ({ items, index, navigation, xOffset, tamarray }) => {
               style={[styles.button1, { flexDirection: 'row' }]}
               onPress={() => navigation.navigate('Carterinha Virtual', { items })}
             >
-              <Image
-                source={require('../assets/cartao.png')}
-                style={{ width: 22, height: 18, justifyContent: 'space-evenly', right: 5 }}
-              />
               <Text style={styles.buttonText}>Carterinha Virtual</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={[styles.button2, { flexDirection: 'row' }]}
               onPress={() => navigation.navigate('Gerar Token', { items })}
             >
-              <Image
-                source={require('../assets/qrcode.png')}
-                style={{ width: 22, height: 18, justifyContent: 'space-evenly', right: 5 }}
-              />
               <Text style={styles.buttonText}>Gerar Token</Text>
             </TouchableOpacity>
           </SafeAreaView>

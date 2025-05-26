@@ -1,7 +1,7 @@
 // styles.js
 import { StyleSheet, Dimensions } from 'react-native';
 import { useTheme } from '../../../../context/ThemeContext'; // 👈 Integração com ThemeContext
-
+import { heightPercentageToDP as hp, widthPercentageToDP as wp } from 'react-native-responsive-screen';
 
 // Aqui você pode definir suas cores
 export const cores = {
@@ -84,16 +84,15 @@ export const getStyles = (theme) =>
     rowContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    top: -25
+    bottom: hp('2%'), // Use hp for responsive height
   },
    rowContainer2: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    top: -80
+    bottom: hp('6%'), // Use hp for responsive height
   },
   button: {
     borderWidth: 2,
-    width: 125,
     height: 100,
     borderRadius: 10,
     alignItems: 'center',
@@ -111,7 +110,7 @@ export const getStyles = (theme) =>
   },
   inicontainer: {
     flex: 1, 
-    backgroundColor: theme.cardbackground
+    backgroundColor: theme.cardbackground, 
   },
   textPrice: {
     fontSize: 16,
@@ -125,8 +124,8 @@ export const getStyles = (theme) =>
       backgroundColor: theme.cardbackground,  // Example: white for dark theme, black for light theme
     },
     tabBarStyle: {
-            height: 70,
-            top: -20,
+            height: wp('25%'), // Use wp for responsive width
+            top: hp('-4%'), // Use hp for responsive height
             backgroundColor: theme.menubackground, //'white'
           },
   tabBarLabelStyle: {

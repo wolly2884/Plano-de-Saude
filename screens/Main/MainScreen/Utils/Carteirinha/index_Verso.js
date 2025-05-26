@@ -19,83 +19,21 @@ const App = ({ navigation }) => {
     <View style={styles.container}>
       <LinearGradient style={styles.CVgradient} colors={['#192f6a', 'red']}>
 
-        <SafeAreaView 
-          style={{
-            width: 60, 
-            height: '100%', 
-            backgroundColor: '#000', 
-            left: 220 
-          }}
-        />
-        
-        <Text 
-          style={{
-            transform: [{ rotate: '90deg' }], 
-            left: 50, 
-            bottom: 180, 
-            color: '#fff', 
-            fontSize: 10
-          }}
-        >
-          Confira a Assinatura
-        </Text>
-        
-        <Text 
-          style={{
-            transform: [{ rotate: '90deg' }], 
-            left: -30, 
-            bottom: 200, 
-            color: '#fff', 
-            fontSize: 10
-          }}
-        >
-          Assinatura do Segurado
-        </Text>
-  
-        <Text 
-          style={{
-            transform: [{ rotate: '90deg' }], 
-            left: -98,  
-            bottom: 420, 
-            color: '#fff', 
-            fontSize: 10
-          }}
-        >
-          {relacio}
-        </Text>
-        
-        <Text 
-          style={{
-            transform: [{ rotate: '90deg' }], 
-            left: -100, 
-            bottom: 250, 
-            color: '#fff', 
-            fontSize: 10
-          }}
-        >
-          {assistpessoal}
-        </Text>
+        <SafeAreaView style={styles.containerVerso} />    
+        <SafeAreaView style={styles.faixaverso} />
 
-        <SafeAreaView 
-          style={{
-            width: 60, 
-            height: '95%', 
-            backgroundColor: '#fff', 
-            left: 140,
-            bottom: 710,
-          }}
-        />
+        <Text style={styles.versoText}>Confira a Assinatura</Text>
+        <Text style={styles.versoText2}>Assinatura do Segurado</Text>
+        <Text style={styles.versoText3}>{relacio}</Text>    
+        <Text style={styles.versoText4}>{assistpessoal}</Text>
         
-        <View style={{width: 50, bottom: 120, right: 40, transform: [{ rotate: '90deg' }], position: 'absolute' }}>
+        <View style={styles.logointroverso}>
             <Logointro />
         </View>
-
-        <SafeAreaView>
-        </SafeAreaView>
       </LinearGradient>
 
-      <TouchableOpacity style={{marginLeft: 50, top: 30, flexDirection: 'row'}} onPress={ () => navigation.navigate('Carterinha Virtual')}>
-          <IconCarteirinha style={{width: 30, height: 30}} />
+      <TouchableOpacity style={styles.bottonverso} onPress={ () => navigation.navigate('Carterinha Virtual')}>
+          <IconCarteirinha style={styles.imagebotton} />
           <Text style={styles.Textstyle}>Frente do Cartão</Text>
       </TouchableOpacity>
     </View>
