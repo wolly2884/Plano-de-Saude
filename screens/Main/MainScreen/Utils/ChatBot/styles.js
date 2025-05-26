@@ -1,88 +1,67 @@
 import { StyleSheet } from 'react-native';
-  
-export const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  scrollContent: {
-    flexGrow: 1,
-    justifyContent: 'flex-end',
-  },
-  chatArea: {
-    padding: 5,
-    minHeight: '90%',
-    paddingBottom: 70
-  },
-  inputArea: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    borderWidth: 1,
-    borderRadius: 40,
-    width: '170%',
-    height: 50,
-    bottom: 80,
 
-  },
-  input: {
-    flex: 1,
-    marginRight: 16,
-    padding: 8,
-    borderColor: '#ccc',
-  },
-  userMessageContainer: {
-    alignSelf: 'flex-end',
-    backgroundColor: '#e6e6e6',
-    maxWidth: '70%',
-    padding: 20,
-    marginVertical: 5,
-    borderRadius: 8,
-    flexDirection: 'row-reverse',
-    padding: 10,
-    left: 10,
-    borderTopRightRadius: 0
-  },
-  botMessageContainer: {
-    alignSelf: 'flex-start',
-    backgroundColor: '#cdcdcd',
-    maxWidth: '70%',
-    padding: 10,
-    marginVertical: 5,
-    borderRadius: 20,
-    flexDirection: 'row',
-    left: 10, 
-    borderTopLeftRadius: 0
-  },
-  userMessage: {
-    fontSize: 16,
-    color: 'black',
-    left: 5,
-  paddingRight: 5
-  },
-  botMessage: {
-    fontSize: 16,
-    color: 'black',
-    left: 5
-  },
-  button:{
-    borderRadius: 20,
-    bottom: 80,
-    left: 5,
-    borderRadius: 200,
-    borderWidth: 1,
-    width: 50,
-    height: 50
-  },
-  Icon:{
-    alignSelf: 'center', 
-    bottom: 0, 
-    top: 10, 
-    left: -3 
-  },
-  ViewText:{ 
-    flexDirection: 'row', 
-    height: '5.5%', 
-    width: '50%', 
-    bottom: 40, 
-    top: 10 }
-});
+export const getStyles = (theme) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.backgroundColor || '#fff',
+    },
+    contentContainer: {
+      padding: 20,
+    },
+    section: {
+      marginBottom: 20,
+    },
+    dropdown: {
+      borderWidth: 1,
+      borderColor: theme.borderColor || '#ccc',
+      borderRadius: 5,
+    },
+    dropdownError: {
+      borderColor: theme.errorColor || 'red',
+    },
+    dropdownStyles: {
+      fontSize: 14,
+      marginTop: 10,
+      marginBottom: 20,
+      borderWidth: 1,
+      borderColor: theme.borderColor || '#ccc',
+    },
+    dropdownText: {
+      color: theme.textColor || '#000',
+      fontSize: 14,
+    },
+    dropdownPlaceholder: {
+      color: theme.placeholderColor || '#999',
+    },
+    input: {
+      borderWidth: 1,
+      borderColor: theme.borderColor || '#ccc',
+      borderRadius: 5,
+      padding: 10,
+      marginBottom: 10,
+    },
+    button: {
+      backgroundColor: theme.primaryColor || '#007AFF',
+      padding: 15,
+      borderRadius: 5,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    buttonText: {
+      color: theme.buttonTextColor || '#fff',
+      fontSize: 16,
+      fontWeight: 'bold',
+    },
+    errorMessage: {
+      color: theme.errorColor || 'red',
+      fontSize: 12,
+      marginBottom: 10,
+    },
+    loadingText: {
+      color: theme.textColor || '#000',
+      fontSize: 16,
+      textAlign: 'center',
+      marginBottom: 20,
+    },
+  });
