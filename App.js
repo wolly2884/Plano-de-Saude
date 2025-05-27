@@ -26,6 +26,7 @@ import Contato                   from './screens/Main/MainScreen/Utils/contato/i
 import Alarme                    from './screens/Main/MainScreen/Utils/Alarme/index'
 import Noticias                  from './screens/Main/MainScreen/Utils/Noticia/index'
 import ChatBot                   from './screens/Main/MainScreen/Utils/ChatBot/chatbot'
+import Chatmessage               from './screens/Main/MainScreen/Utils/ChatBot/chatmessage'
 import Manuais                   from './screens/Main/MainScreen/Utils/Manuais/app'
 import AlterSenha                from './screens/Main/MainScreen/Utils/AlterSenha/app'
 import AlterCad                  from './screens/Main/MainScreen/Utils/AlterCadastro/app'
@@ -57,7 +58,7 @@ const App = () => {
         <MenuProvider style={{ backgroundColor: '#fff' }}>
           <Stack.Navigator>
             
-            <Stack.Screen name="Bem-Vindo"              component={Pages}            options={{ headerShown: false }} />
+            <Stack.Screen name="Bem-Vindo"              component={BemVindo}            options={{ headerShown: false }} />
             <Stack.Screen name="Home"                   component={Home}                options={{ headerShown: false }} />
             <Stack.Screen name="login"                  component={Login}               options={{ headerShown: false }} />
             <Stack.Screen name="pagina"                 component={Pages}               options={{ headerShown: false }} />
@@ -76,6 +77,7 @@ const App = () => {
             <Stack.Screen name="Manuais"                component={Manuais}             options={{ headerShown: true  }} />
             <Stack.Screen name="Cadastro"               component={Cadastro}            options={{ headerShown: true  }} />
             <Stack.Screen name="Atendimento ao Cliente" component={ChatBot}             options={{ headerShown: true  }} /> 
+            <Stack.Screen name="Chat Live"              component={Chatmessage}             options={{ headerShown: true  }} /> 
             <Stack.Screen name="Agendamento"            component={Agendamento}         options={{ headerShown: true  }} />
             <Stack.Screen name="Agenda"                 component={schedule}            options={{ headerShown: true  }} />  
             <Stack.Screen name="Receita"                component={Receita}             options={{ headerShown: true  }} />    

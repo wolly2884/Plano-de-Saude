@@ -1,88 +1,243 @@
-import { StyleSheet } from 'react-native';
-  
-export const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  scrollContent: {
-    flexGrow: 1,
-    justifyContent: 'flex-end',
-  },
-  chatArea: {
-    padding: 5,
-    minHeight: '90%',
-    paddingBottom: 70
-  },
-  inputArea: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    borderWidth: 1,
-    borderRadius: 40,
-    width: '170%',
-    height: 50,
-    bottom: 80,
+import { StyleSheet, Dimensions } from 'react-native';
 
-  },
-  input: {
-    flex: 1,
-    marginRight: 16,
-    padding: 8,
-    borderColor: '#ccc',
-  },
-  userMessageContainer: {
-    alignSelf: 'flex-end',
-    backgroundColor: '#e6e6e6',
-    maxWidth: '70%',
-    padding: 20,
-    marginVertical: 5,
-    borderRadius: 8,
-    flexDirection: 'row-reverse',
-    padding: 10,
-    left: 10,
-    borderTopRightRadius: 0
-  },
-  botMessageContainer: {
-    alignSelf: 'flex-start',
-    backgroundColor: '#cdcdcd',
-    maxWidth: '70%',
-    padding: 10,
-    marginVertical: 5,
-    borderRadius: 20,
-    flexDirection: 'row',
-    left: 10, 
-    borderTopLeftRadius: 0
-  },
-  userMessage: {
-    fontSize: 16,
-    color: 'black',
-    left: 5,
-  paddingRight: 5
-  },
-  botMessage: {
-    fontSize: 16,
-    color: 'black',
-    left: 5
-  },
-  button:{
-    borderRadius: 20,
-    bottom: 80,
-    left: 5,
-    borderRadius: 200,
-    borderWidth: 1,
-    width: 50,
-    height: 50
-  },
-  Icon:{
-    alignSelf: 'center', 
-    bottom: 0, 
-    top: 10, 
-    left: -3 
-  },
-  ViewText:{ 
-    flexDirection: 'row', 
-    height: '5.5%', 
-    width: '50%', 
-    bottom: 40, 
-    top: 10 }
-});
+// Get window dimensions for basic responsiveness
+const { width, height } = Dimensions.get('window');
+
+export const getStyles = (theme) =>
+  StyleSheet.create({
+    containerpage1: {
+      flex: 1,
+      backgroundColor: theme.backgroundColor,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    titlepage1: {
+      position: 'absolute',
+      fontSize: 28,
+      color: theme.textColor,
+      top: 0,
+    },
+    imagepage1: {
+      width: 240,
+      height: 300,
+      position: 'absolute',
+      top: 40,
+    },
+    scrollpage1: {
+      top: 110,
+      height: 480,
+    },
+    viewpage1: {
+      marginTop: 220,
+      width: '100%',
+    },
+    view2page1: {
+      marginTop: 10,
+      width: '100%',
+    },
+    buttonpage1: {
+      width: '30%',
+      borderWidth: 1,
+      height: 40,
+      position: 'absolute',
+      bottom: 100,
+      right: 10,
+      marginEnd: 0,
+      borderRadius: 30,
+      backgroundColor: theme.buttonBackground,
+    },
+    buttonview: {
+      borderWidth: 0,
+      height: 40,
+    },
+    textbutton: {
+      textAlign: 'center',
+      textAlignVertical: 'center',
+      fontSize: 25,
+      color: theme.buttonTextColor,
+    },
+    buttonhorpage2: {
+      marginHorizontal: 10,
+    },
+    imagepage2: {
+      width: 20,
+      height: 20,
+    },
+    textinfopage2: {
+      fontSize: 20,
+      fontStyle: 'italic',
+      fontWeight: 'bold',
+      color: theme.textColor,
+    },
+    image2page2: {
+      width: '40%',
+      height: '90%',
+      position: 'absolute',
+      bottom: 0,
+      right: 10,
+    },
+    buttonpage2: {
+      width: '10%',
+      height: '10%',
+    },
+    imagebuttonpage2: {
+      width: 30,
+      height: 30,
+      top: 100,
+    },
+    buttonhor: {
+      top: 10,
+      width: 90,
+      height: 30,
+      borderRadius: 20,
+      alignItems: 'center',
+      alignContent: 'center',
+      flexDirection: 'row',
+      justifyContent: 'space-around',
+      padding: 5,
+    },
+    texthor: {
+      fontSize: 13,
+      fontWeight: 'bold',
+      fontStyle: 'italic',
+    },
+    horarios: {
+      fontSize: 30,
+      fontWeight: 'bold',
+      fontStyle: 'italic',
+      top: -60,
+      left: 40,
+      color: theme.textColor,
+    },
+    dropdown: {
+      backgroundColor: theme.inputBackground,
+      borderColor: theme.textColor,
+      borderWidth: 1,
+      borderRadius: 8,
+      marginBottom: 10,
+      width: '97%',
+      color: theme.inputTextColor,
+    },
+    dropdownText: {
+      color: theme.inputTextColor,
+      fontSize: 18,
+      textAlign: 'center',
+    },
+    dropdownPlaceholder: {
+      color: theme.placeholderColor,
+      fontSize: 18,
+      textAlign: 'center',
+    },
+    dropdownError: {
+      borderColor: theme.errorMessagem,
+      borderWidth: 2,
+    },
+    container: {
+      flex: 1,
+      backgroundColor: theme.backgroundColor,
+      padding: 20,
+    },
+    scrollViewContent: {
+      top: 90,
+    },
+    View: {
+      backgroundColor: theme.backgroundColor,
+      alignSelf: 'flex-start',
+      paddingHorizontal: 3,
+      marginStart: 20,
+      zIndex: 1,
+      elevation: 1,
+      position: 'absolute',
+      top: 12,
+    },
+    Text: {
+      backgroundColor: theme.backgroundColor,
+      alignSelf: 'flex-start',
+      paddingHorizontal: 3,
+      marginStart: 20,
+      zIndex: 1,
+      elevation: 1,
+      position: 'absolute',
+      top: -12,
+      left: 10,
+    },
+    Cadinput: {
+      backgroundColor: theme.inputBackground,
+      borderRadius: 5,
+      marginBottom: 15,
+    },
+    Cadbutton: {
+      backgroundColor: theme.buttonBackground,
+      borderRadius: 5,
+      padding: 15,
+      alignItems: 'center',
+      marginBottom: 40,
+    },
+    CadbuttonText: {
+      color: theme.buttonTextColor,
+      fontWeight: 'bold',
+      fontSize: 16,
+    },
+    errorMessage: {
+      fontSize: 10,
+      color: theme.errorMessagem,
+      left: 20,
+      top: -1,
+    },
+    modalContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: 'rgba(0,0,0,0.5)',
+    },
+    modalContent: {
+      width: width * 0.8,
+      backgroundColor: theme.modalBackground,
+      borderRadius: 10,
+      padding: 20,
+    },
+    modalTitle: {
+      fontSize: 20,
+      fontWeight: 'bold',
+      color: theme.modalTextColor,
+    },
+    input: {
+      height: 40,
+      borderColor: theme.textColor,
+      borderWidth: 1,
+      marginBottom: 20,
+      paddingHorizontal: 20,
+      width: '100%',
+      color: theme.modalTextColor,
+    },
+    buttonContainer: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+    },
+    modal: {
+      justifyContent: 'center',
+      margin: 0,
+    },
+    button: {
+      borderRadius: 20,
+      bottom: 60,
+      borderWidth: 1,
+      width: 45,
+      height: 45,
+      left: 100,
+      alignSelf: 'flex-end',
+    },
+    Icon: {
+      alignSelf: 'center',
+      bottom: 0,
+      top: 10,
+      left: -3,
+    },
+    ViewText: {
+      flexDirection: 'row',
+      height: '5.5%',
+      width: '50%',
+      bottom: 50,
+      top: 10,
+    },
+  });

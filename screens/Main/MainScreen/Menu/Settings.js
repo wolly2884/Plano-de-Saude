@@ -1,8 +1,8 @@
 import React from 'react';
 import { View, Text} from 'react-native';
 import Botao from '../../../../components/BotaoMenu';
-import { styles } from './styles';
-import Rodape from '../../../../components/Rodape';
+import { useTheme } from '../../../../context/ThemeContext';
+import { getStyles } from './ModalStyles';
 
 const Menu = ({ navigation }) => {
   const { theme, isThemeLoaded } = useTheme();
