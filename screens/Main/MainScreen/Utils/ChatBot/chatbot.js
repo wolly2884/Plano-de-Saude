@@ -101,7 +101,7 @@ const App = ({ navigation }) => {
                   nome: item.nm_beneficiario,
                   cpf: item.cd_cpf,
                   email: item.ds_email,
-                  cardnumber: item.cd_cpf,
+                  cardnumber: item.cd_cardnumber,
                 }));
                 setBeneficiaries(beneficiaryData);
                 await AsyncStorage.setItem('beneficiaries', JSON.stringify(beneficiaryData));

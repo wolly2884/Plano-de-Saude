@@ -16,7 +16,7 @@ export const getTabStyle = () => {
   return {
     inicontainer: {
       flex: 1,
-      backgroundColor: theme === 'dark' ? '#000' : '#fff',
+      backgroundColor: theme.backgroundColor,
     },
     tabBarActiveTintColor: theme === 'dark' ? '#fff' : '#000',
     tabBarActiveBackgroundColor: theme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
@@ -74,7 +74,6 @@ export const getStyles = (theme) =>
     flex: 1,
     justifyContent: 'space-between',
     borderWidth: 1,
-    borderRadius: 30,
     backgroundColor: theme.menubackground, //'white'
   },
   rowContainerchat: {
@@ -110,7 +109,6 @@ export const getStyles = (theme) =>
   },
   inicontainer: {
     flex: 1, 
-    backgroundColor: theme.cardbackground, 
   },
   textPrice: {
     fontSize: 16,
@@ -133,5 +131,6 @@ export const getStyles = (theme) =>
             fontWeight: 'bold',
             fontStyle: 'italic',
             bottom: 1,
+            
           },
 });

@@ -55,7 +55,7 @@ const App = () => {
     <ThemeProvider>
       <NavigationContainer>
       
-        <MenuProvider style={{ backgroundColor: '#fff' }}>
+        <MenuProvider style={{ backgroundColor: ThemeProvider.backgroundColor }}>
           <Stack.Navigator>
             
             <Stack.Screen name="Bem-Vindo"              component={BemVindo}            options={{ headerShown: false }} />

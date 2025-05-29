@@ -14,6 +14,7 @@ import api from '../../../../../api/api';
 import { SelectList } from 'react-native-dropdown-select-list';
 import { useTheme } from '../../../../../context/ThemeContext';
 import { getStyles } from './Styles';
+import SelectBeneficiario  from '../../../../../components/SelectBeneficiario';
 
 const App = ({ navigation }) => {
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -102,23 +103,13 @@ const App = ({ navigation }) => {
       <View style={{flex: 1}}>
         <View style={styles.container}>
           <SafeAreaView>
-            <SelectList
-                placeholder="Selecione o Beneficiário"
-                searchPlaceholder="Pesquise..."
-                setSelected={setSelectedItem}
-                data={beneficiarios}
-                search={true}
-                boxStyles={[styles.dropdown, isEmptyDropDownPicker ? styles.dropdownError : {}]}
-                inputStyles={styles.dropdownText}
-                dropdownTextStyles={styles.dropdownText}
-                placeholderStyle={styles.dropdownPlaceholder}
-                dropdownStyles={styles.dropdown}
-                onSelect={() => selecionado(beneficiarios.find(item => item.key === selectedItem))}
-              />
-              {isEmptyDropDownPicker && (
-                <Text style={styles.errorMessage}>Selecione o Beneficiário</Text>
-              )}
-            </SafeAreaView>
+            <SelectBeneficiario
+              selectedItem={selectedItem}
+              setSelectedItem={setSelectedItem}
+              onSelect={(item) => selecionado(item)}
+              isEmpty={isEmptyDropDownPicker}
+            />
+          </SafeAreaView>
 
           <View style={{ flex: 1 }}>
             <InputTexto

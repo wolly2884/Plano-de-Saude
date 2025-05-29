@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Alert, Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { cpf } from 'cpf-cnpj-validator';
-import { styles } from './Styles';
 import api from '../../api/api';
 import Modal from 'react-native-modal';
+import { useTheme } from '../../context/ThemeContext';
+import  {getStyles} from './Styles'; // <-- import separado
 
 const App = ({ navigation }) => {
   const [login, setLogin] = useState('');
@@ -13,6 +14,8 @@ const App = ({ navigation }) => {
   const [storedEmail, setstoredEmail] = useState('');
   const [storedPassword, setstoredPassword] = useState('');
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const { theme, isThemeLoaded } = useTheme();
+  const styles = getStyles(theme);
 
   const handleLogin = async () => {
     try {

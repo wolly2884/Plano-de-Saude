@@ -1,9 +1,10 @@
-import { StyleSheet } from 'react-native';
-  
-export const styles = StyleSheet.create({
+import { StyleSheet, Dimensions } from 'react-native';
+import { heightPercentageToDP as hp, widthPercentageToDP as wp } from 'react-native-responsive-screen';
+
+export const getStyles = (theme) => StyleSheet.create({
     // Login
   loginsearchBar: {
-    backgroundColor: '#ffffff',
+    backgroundColor: theme.backgroundColor,
     padding: 10,
   },
   logininput: {
@@ -27,6 +28,7 @@ export const styles = StyleSheet.create({
   },
   loginTexto:{
     textAlign: 'center',
+    color: theme.textColor,
   },
    container: {
     flex: 1,

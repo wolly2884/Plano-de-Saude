@@ -1,16 +1,18 @@
 import { StyleSheet } from 'react-native';
+import { useTheme } from '../../../../../context/ThemeContext';
 
-export const getStyles = (theme) => {
-  return {
+export const getStyles = () => {
+  const theme = useTheme();
+  return StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: theme.backgroundColor,
+      backgroundColor: theme.isNightMode ? '#121212' : '#757575',
     },
     loadingContainer: {
       flex: 1,
       justifyContent: 'center',
       alignItems: 'center',
-      backgroundColor: theme.backgroundColor,
+      backgroundColor: theme.isNightMode ? '#121212' : '#ffffff',
     },
     emptyDate: {
       flex: 1,
@@ -21,20 +23,20 @@ export const getStyles = (theme) => {
     },
     emptyText: {
       fontSize: 18,
-      color: theme.errorMessagem,
+      color: theme.errorMessage,
       textAlign: 'center',
     },
     timelineContainer: {
       flex: 1,
-      backgroundColor: theme.inputBackground,
+      backgroundColor: theme.backgroundColor,
       padding: 10,
       marginTop: 10,
     },
     calendarBackground: {
-      backgroundColor: theme.inputBackground,
+      backgroundColor: theme.backgroundColor,
     },
     calendarText: {
-      color: theme.textColor,
+      color: theme.isNightMode ?  '#ffffff' : '#121212',
     },
     calendarSelectedColor: {
       backgroundColor: theme.tabBarActiveTextColor,
@@ -55,5 +57,8 @@ export const getStyles = (theme) => {
     timelineCircleColor: {
       backgroundColor: theme.tabBarActiveTextColor,
     },
-  };
+    ActivityIndicator : { textAlign: 'center', 
+      color: theme.isNightMode ?  '#ffffff' : '#121212', 
+    },
+  });
 };

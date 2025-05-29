@@ -24,6 +24,7 @@ import {
   validateAndFormatDate,
 } from '../../../../../components/validations';
 import { SelectList } from 'react-native-dropdown-select-list';
+import SelectBeneficiario  from '../../../../../components/SelectBeneficiario';
 
 // Componente para seções expansíveis
 const CollapsibleSection = ({ title, isOpen, onToggle, children, theme }) => {
@@ -121,56 +122,6 @@ const App = ({ navigation }) => {
     }, 0);
   };
 
-  // Carrega ID do AsyncStorage
-  useFocusEffect(
-    React.useCallback(() => {
-      const checkLoginStatus = async () => {
-        try {
-          const storedID = await AsyncStorage.getItem('ID');
-          const userData = await api.get('/Beneficiario/get/' + storedID);
-          const rowCount = userData.data.rowCount;
-
-          if (rowCount > 0) {
-            setBeneficiario(
-              userData.data.rows.map((item) => ({
-                key: item.id,
-                value: item.nm_beneficiario,
-                nm_beneficiario: item.nm_beneficiario,
-                cd_cpf: item.cd_cpf,
-                cd_password: item.cd_password,
-                cd_age: item.cd_age,
-                ic_estado_civil: item.ic_estado_civil,
-                ic_sexo: item.ic_sexo,
-                ds_email: item.ds_email,
-                cd_celular: item.cd_celular,
-                nm_logradouro: item.nm_logradouro,
-                cd_numero: item.cd_numero,
-                nm_complemento: item.nm_complemento,
-                nm_cidade: item.nm_cidade,
-                cd_cep: item.cd_cep,
-                sg_estado: item.sg_estado,
-                cd_cardnumber: item.cd_cardnumber,
-                ds_healthplan: item.ds_healthplan,
-                cd_cns: item.cd_cns,
-                dt_inclusao: item.dt_inclusao,
-              }))
-            );
-          } else {
-            Alert.alert(
-              'Usuário não encontrado',
-              'Por favor, verifique o nome de usuário e tente novamente.'
-            );
-          }
-        } catch (error) {
-          console.error('Erro ao recuperar os dados:', error);
-          Alert.alert('Erro', 'Falha ao carregar dados do beneficiário.');
-        }
-      };
-
-      checkLoginStatus();
-    }, [navigation])
-  );
-
   // Função genérica para atualizar campos do formulário
   const updateFormData = (field, value) => {
     let formattedValue = value;
@@ -259,6 +210,8 @@ const App = ({ navigation }) => {
 
   // Handle beneficiary selection
   const selecionado = (beneficiary) => {
+    
+    console.log('Beneficiário selecionado:', beneficiary);
     if (beneficiary) {
       setFormData({
         nmBeneficiario: beneficiary.nm_beneficiario || '',
@@ -291,22 +244,12 @@ const App = ({ navigation }) => {
       <View style={styles.container}>
         <ScrollView contentContainerStyle={{ paddingBottom: 150 }}>
           <SafeAreaView>
-            <SelectList
-              placeholder="Selecione o Beneficiário"
-              searchPlaceholder="Pesquise..."
-              setSelected={setSelectedItem}
-              data={Beneficiario}
-              search={true}
-              boxStyles={[styles.dropdown, isEmptyDropDownPicker ? styles.dropdownError : {}]}
-              inputStyles={styles.dropdownText}
-              dropdownTextStyles={styles.dropdownText}
-              placeholderStyle={styles.dropdownPlaceholder}
-              dropdownStyles={styles.dropdown}
-              onSelect={() => selecionado(Beneficiario.find((item) => item.key === selectedItem))}
+            <SelectBeneficiario
+              selectedItem={selectedItem}
+              setSelectedItem={setSelectedItem}
+              onSelect={(item) => selecionado(item)}
+              isEmpty={isEmptyDropDownPicker}
             />
-            {isEmptyDropDownPicker && (
-              <Text style={styles.errorMessage}>Selecione o Beneficiário</Text>
-            )}
           </SafeAreaView>
 
           {/* Seção de Dados do Beneficiário */}
