@@ -1,9 +1,13 @@
 import React from 'react';
 import { View, TouchableOpacity, Linking, Text } from 'react-native';
-import {styles} from './styles'
 import Rodape  from '../../../../../components/Rodape'
+import { useTheme } from '../../../../../context/ThemeContext';
+import { getStyles } from './styles';
 
 const DownloadPDFScreen = () => {
+  const { theme } = useTheme();
+  const styles = getStyles(theme);
+
   const ComponentedeContedoeEstrutura = 'https://www.gov.br/ans/pt-br/assuntos/prestadores/padrao-para-troca-de-informacao-de-saude-suplementar-2013-tiss/PadroTISS_ComponentedeContedoeEstrutura_202211.zip';
   const ComponenteOrganizacional = 'https://www.gov.br/ans/pt-br/assuntos/prestadores/padrao-para-troca-de-informacao-de-saude-suplementar-2013-tiss/PadroTISS_ComponenteOrganizacional_202403.pdf';
   const TUSS = 'https://www.ans.gov.br/arquivos/extras/tiss/Padrao_TISS_Representacao_de_Conceitos_em_Saude_202403.zip'
@@ -24,6 +28,7 @@ const DownloadPDFScreen = () => {
   };
 
   return (
+  <View style={{flex: 1}}>
     <View style={styles.container}>
       <Text style={styles.title}>Download de Manuais e Arquivos</Text>
       
@@ -54,6 +59,7 @@ const DownloadPDFScreen = () => {
           <Text style={styles.buttonText}>Componente de Comunicação</Text>
         </TouchableOpacity>
       </View>
+    </View>
       <Rodape />
     </View>
   );

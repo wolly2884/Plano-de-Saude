@@ -1,344 +1,395 @@
-import React from 'react';
-import { View, Text, Button, StyleSheet, Alert } from 'react-native';
-import * as Print from 'expo-print';
-import * as FileSystem from 'expo-file-system';
-import * as Sharing from 'expo-sharing';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import {
+  View, Text, TouchableOpacity, Dimensions,
+  Animated, FlatList, ScrollView, Alert
+} from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import Rodape from '../../../../../components/Rodape';
+import InputTexto from '../../../../../components/InputTexto';
+import SelectBeneficiario from '../../../../../components/SelectBeneficiario';
+import api from '../../../../../api/api';
+import { getStyles } from './styles';
+import { useTheme } from '../../../../../context/ThemeContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { formatDate, formatCEP, formatCPF } from '../../../../../components/validations';
 
-const App = () => {
-  const generatePDF = async () => {
-    try {
-      // Obter a data atual e formatá-la como DD/MM/YYYY
-      const today = new Date();
-      const formattedDate = `${today.getDate().toString().padStart(2, '0')}/${(
-        today.getMonth() + 1
-      )
-        .toString()
-        .padStart(2, '0')}/${today.getFullYear()}`;
+const cardWidth = Dimensions.get('window').width * 0.85;
+const cardSpacing = 40;
+const AnimatedFlatList = Animated.createAnimatedComponent(FlatList);
 
-      const Vencimento = formattedDate;
-      const Local_de_Pagamento = 'Pagavel em qualquer banco até o vencto, após somente no banco emissor.';
-      const EspecieDc = 'FT';
-      const Aceite = 'SIM';
-      const Data_Processamento = formattedDate;
-      const Data_Documento = formattedDate;
-      const Uso_Banco = ' ';
-      const Numero_Documento = ' ';
-      const Carteira = '02';
-      const Especie = 'R$';
-      const Quantidade = '1';
-      const Valor = '0.00 ';
-      const Valor_Documento = '280.00 ';
-      const Instrucoes = 'JUROS POR DIA DE ATRASO: R$0  SERÁ PROTESTADO APÓS 5 DIAS DO VENCIMENTO  -->ATENÇÃO: NÃO PAGUE AO REPRESENTANTE<--   DÚVIDAS LIGUE:(11)   DPTO COBRANÇA EMAIL: ';
-      const Desconto = '0.00';
-      const Outra_Deducoes =  '0.00';
-      const Multa_Mora =  '0.00';
-      const Outros_Acrescimos =  '0.00';
-      const Valor_Cobrado =  '0.00';
-      const Nosso_Numero =  '0.00';
-      const Cedente = '  ';
-      const Codigo_Cedente = ' ';
+export default function FinanceDashboard({ navigation }) {
+  const flatListRef = useRef(null);
+  const scrollX = useRef(new Animated.Value(0)).current;
 
-      // Generate PDF content
-      const htmlContent = `
-      <!DOCTYPE html>
-      <html lang="pt-BR">
-      <head>
-          <meta charset="UTF-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>Ficha de Compensação - Bradesco</title>
-          <style>
-              body {
-                  font-family: Arial, sans-serif;
-                  margin: 20px;
-              }
-              .boleto {
-                  border: 1px solid #000;
-                  padding: 20px;
-                  max-width: 800px;
-                  margin: 0 auto;
-              }
-              .header {
-                  display: flex;
-                  justify-content: space-between;
-                  align-items: center;
-                  border-bottom: 1px dashed #000;
-                  padding-bottom: 10px;
-                  margin-bottom: 20px;
-              }
-              .header img {
-                  height: 40px;
-              }
-              .header .codes {
-                  font-size: 14px;
-                  font-weight: bold;
-              }
-              .section {
-                  margin-bottom: 0.1px;
-              }
-              .section-title {
-                  font-weight: bold;
-                  margin-bottom: 5px;
-              }
-              .table {
-                  border: 1px solid #000;
-                  width: 100%;
-                  box-sizing: border-box;
-              }
-              .table-row {
-                  display: flex;
-                  border-bottom: 1px solid #000;
-              }
-              .table-row:last-child {
-                  border-bottom: none;
-              }
-              .table-cell {
-                  flex: 1;
-                  padding: 5px;
-                  border-right: 1px solid #000;
-                  min-height: 30px;
-                  min-width: 90px;
-              }
-              .table-cell2 {
-                  flex: 1;
-                  padding: 5px;
-                  border-right: 1px solid #000;
-                  min-height: 20px;
-                  min-width: 30px;
-              }
-              .table-cell:last-child {
-                  border-right: none;
-              }
-              .barcode {
-                  height: 50px;
-                  background: repeating-linear-gradient(
-                      90deg,
-                      #000,
-                      #000 2px,
-                      #fff 2px,
-                      #fff 4px
-                  );
-                  margin: 10px 0;
-              }
-              .footer {
-                  text-align: center;
-                  font-size: 12px;
-                  border-top: 1px dashed #000;
-                  padding-top: 10px;
-              }
-          </style>
-      </head>
-      <body>
-          <div class="boleto">
-              <div class="header">
-                  <img src="https://banco.bradesco/erro-404/assets/img/logo.svg" alt="Bradesco Logo">
-                  <div class="codes">
-                      <span>237-2</span> | <span>2379</span> | <span>90000</span> | <span>69000</span> | <span>6 800000000087064</span>
-                  </div>
-              </div>
+  const [beneficiarios, setBeneficiarios] = useState([]);
+  const [selectedItem, setSelectedItem] = useState('');
+  const [selectedCpf, setSelectedCpf] = useState('');
+  const [ano, setAno] = useState('');
+  const [mes, setMes] = useState('');
+  const [selectedCards, setSelectedCards] = useState([]);
+  const [index, setIndex] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(false);
+  const [showCards, setShowCards] = useState(false);
+  const [beneficiaryName, setBeneficiaryName] = useState('');
+  const [familyTotalBalance, setFamilyTotalBalance] = useState('0.00');
+  const [id, setId] = useState('');
 
-              <div class="section">
-                  <div class="table">
-                      <div class="table-row">
-                          <div class="table-cell">
-                              <span style="font-size: 10px; vertical-align: top"> Local de Pagamento </span>
-                              <input type="text" style="width: 100%; border: none;" value="${Local_de_Pagamento}" readonly>
-                          </div>
-                          <div class="table-cell2">
-                              <span style="font-size: 10px; vertical-align: top"> Vencimento </span>
-                              <input type="text" style="width: 100%; border: none;" value="${Vencimento}" readonly>
-                          </div> 
-                      </div>
-                  </div>
-              </div>
+  const { theme } = useTheme();
+  const styles = getStyles(theme);
 
-              <div class="section">
-                  <div class="table">
-                      <div class="table-row">
-                          <div class="table-cell"> 
-                              <span style="font-size: 10px; vertical-align: top"> Cedente </span>
-                              <input type="text" style="width: 100%; border: none;" value="${Cedente}" readonly>
-                          </div>
-                          <div class="table-cell">  
-                              <span style="font-size: 10px; vertical-align: top"> Agencia/ Codigo do Cedente </span>
-                              <input type="text" style="width: 100%; border: none;" value="${Codigo_Cedente}" readonly>
-                          </div> 
-                      </div>
-                  </div>
-              </div>
+  // Fetch beneficiaries on mount
+  useEffect(() => {
+    const fetchBeneficiarios = async () => {
+      setIsLoading(true);
+      const storedID = await AsyncStorage.getItem('ID');
+      try {
+        const { data } = await api.get(`/beneficiario/get/${storedID}`);
+        setBeneficiarios(data.rows.map(b => ({
+          key: b.id.toString(),
+          nm_logradouro: b.nm_logradouro || 'Desconhecido',
+          cd_cpf: b.cd_cpf || 'Desconhecido',
+          cd_numero: b.cd_numero || 'Desconhecido',
+          nm_complemento: b.nm_complemento || 'Desconhecido',
+          nm_cidade: b.nm_cidade || 'Desconhecido',
+          cd_cep: b.cd_cep || 'Desconhecido',
+          sg_estado: b.sg_estado || 'Desconhecido',
+          ic_beneficiario: b.ic_beneficiario || 'Desconhecido',
+          value: b.nm_beneficiario  || 'Desconhecido',
+        })));
+      } catch (err) {
+        console.error('Erro ao buscar beneficiários:', err);
+        Alert.alert('Erro', 'Não foi possível carregar os beneficiários.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchBeneficiarios();
+  }, []);
 
-              <div class="section">
-                  <div class="table">
-                      <div class="table-row">
-                          <div class="table-cell">
-                              <span style="font-size: 10px; vertical-align: top"> Data do Documento </span>
-                              <input type="text" style="width: 100%; border: none;" value="${Data_Documento}" readonly>
-                          </div>
-                          <div class="table-cell">
-                              <span style="font-size: 10px; vertical-align: top"> Numero do Documento </span>
-                              <input type="text" style="width: 100%; border: none;" value="${Numero_Documento}" readonly>
-                          </div>
-                          <div class="table-cell">
-                              <span style="font-size: 10px; vertical-align: top"> Especie do Documento </span>
-                              <input type="text" style="width: 100%; border: none;" value="${EspecieDc}" readonly>
-                          </div>
-                          <div class="table-cell">
-                              <span style="font-size: 10px; vertical-align: top"> Aceite </span>
-                              <input type="text" style="width: 100%; border: none;" value="${Aceite}" readonly>
-                          </div>
-                          <div class="table-cell">
-                              <span style="font-size: 10px; vertical-align: top"> Data Processamento </span>
-                              <input type="text" style="width: 100%; border: none;" value="${Data_Processamento}" readonly>
-                          </div>
-                          <div class="table-cell">
-                              <span style="font-size: 10px; vertical-align: top"> Nosso Numero </span>
-                              <input type="text" style="width: 100%; border: none;" value="${Nosso_Numero}" readonly>
-                          </div>
-                      </div>
-                  </div>
-              </div>
+  // Reset index and cards when filters change
+  useEffect(() => {
+    setIndex(0);
+    setShowCards(false);
+    flatListRef.current?.scrollToOffset({ offset: 0, animated: false });
+  }, [beneficiarios, ano, mes]);
 
-              <div class="section">
-                  <div class="table">
-                      <div class="table-row">
-                          <div class="table-cell">
-                              <span style="font-size: 10px; vertical-align: top"> Uso do Banco </span>
-                              <input type="text" style="width: 100%; border: none;" value="${Uso_Banco}" readonly>
-                          </div>
-                          <div class="table-cell">
-                              <span style="font-size: 10px; vertical-align: top"> Carteira </span>
-                              <input type="text" style="width: 100%; border: none;" value="${Carteira}" readonly>
-                          </div>
-                          <div class="table-cell">
-                              <span style="font-size: 10px; vertical-align: top"> Especie </span>
-                              <input type="text" style="width: 100%; border: none;" value="${Especie}" readonly>
-                          </div>
-                          <div class="table-cell">
-                              <span style="font-size: 10px; vertical-align: top"> Quantidade </span>
-                              <input type="text" style="width: 100%; border: none;" value="${Quantidade}" readonly>
-                          </div>
-                          <div class="table-cell">
-                              <span style="font-size: 10px; vertical-align: top"> Valor </span>
-                              <input type="text" style="width: 100%; border: none;" value="${Valor}" readonly>
-                          </div>
-                          <div class="table-cell">
-                              <span style="font-size: 10px; vertical-align: top"> Valor do Documento </span>
-                              <input type="text" style="width: 100%; border: none;" value="${Valor_Documento}" readonly>
-                          </div>
-                      </div>
-                  </div>
-              </div>
-                <table style="border-collapse: collapse; width: 100%; height: 208px;" border="1">
-                    <tbody>
-                      <tr style="height: 43px; vertical-align: top;">
-                        <td style="width: 80%; height: 208px; text-align: justify; vertical-align: top;" rowspan="6">
-                          <span style="font-size: 10px; vertical-align: top;"> Instruções (Testo de Responsabilidade do Cedente)</span>
-                          <input type="text" style="width: 100%; border: none;" value="${Instrucoes}" readonly>
-                        </td>
-                        <td style="width: 20.405%; height: 43px;">
-                          <span style="font-size: 10px; vertical-align: top;"> (-) Desconto/ Abatimento </span>
-                          <input type="text" style="width: 100%; border: none;" value="${Desconto}" readonly>
-                        </td>
-                      </tr>
-                      
-                      <tr style="height: 34px; vertical-align: top;">
-                        <td style="width: 60%; height: 41px; vertical-align: top;">
-                          <span style="font-size: 10px; vertical-align: top;"> (-) Outras Deduções </span>
-                          <input type="text" style="width: 100%; border: none;" value="${Outra_Deducoes}" readonly>
-                        </td>
-                      </tr>
-                      
-                      <tr style="height: 29px; vertical-align: top;">
-                        <td style="width: 60%; height: 40px;">
-                          <span style="font-size: 10px; vertical-align: top;"> (+) Multa/ Mora </span>
-                          <input type="text" style="width: 100%; border: none;" value="${Multa_Mora}" readonly>
-                        </td>
-                      </tr>
-                      
-                      <tr style="height: 37px; vertical-align: top;">
-                        <td style="width: 60%; height: 37px;">
-                          <span style="font-size: 10px; vertical-align: top;"> (+) Outros Acrescimos </span>
-                          <input type="text" style="width: 100%; border: none;" value="${ Outros_Acrescimos}" readonly>
-                        </td>
-                      </tr>
-                      
-                      <tr style="height: 47px; vertical-align: top;">
-                        <td style="width: 60%; height: 47px;">
-                          <span style="font-size: 10px; vertical-align: top;"> (+) Valor Cobrado </span>
-                          <input type="text" style="width: 100%; border: none;" value="${Valor_Cobrado}" readonly>
-                        </td>
-                      </tr>
-                    
-                    </tbody>
-                </table>
-              <div class="barcode"></div>
-              <div class="footer">
-                  FICHA DE COMPENSAÇÃO
-              </div>
-          </div>
-      </body>
-      </html>
-      `;
+  // Update index based on scroll position
+  useEffect(() => {
+    const listener = scrollX.addListener(({ value }) => {
+      const newIndex = Math.round(value / (cardWidth + cardSpacing));
+      if (newIndex !== index && newIndex >= 0 && newIndex < selectedCards.length) {
+        setIndex(newIndex);
+      }
+    });
+    return () => scrollX.removeListener(listener);
+  }, [index, selectedCards.length]);
 
-      // Generate PDF
-      const { uri: pdfUri } = await Print.printToFileAsync({
-        html: htmlContent,
-        base64: false,
-      });
-
-      // Definir o caminho de destino no diretório de documentos
-      const timestamp = Date.now();
-      const fileName = `sample_${timestamp}.pdf`;
-      const destinationPath = `${FileSystem.documentDirectory}${fileName}`;
-
-      // Mover o PDF para o diretório de documentos
-      await FileSystem.moveAsync({
-        from: pdfUri,
-        to: destinationPath,
-      });
-
-      Alert.alert(
-        'Success',
-        `PDF saved to ${destinationPath}`,
-        [
-          {
-            text: 'Share PDF',
-            onPress: async () => {
-              const isAvailable = await Sharing.isAvailableAsync();
-              if (isAvailable) {
-                await Sharing.shareAsync(destinationPath);
-              } else {
-                Alert.alert('Error', 'Sharing is not available on this device.');
-              }
-            },
-          },
-          { text: 'OK' },
-        ]
-      );
-    } catch (error) {
-      console.error('Error generating or saving PDF:', error);
-      Alert.alert('Error', `Failed to generate or save PDF: ${error.message}`);
+  // Fetch titles for a single beneficiary or all beneficiaries
+  const fetchTitulos = useCallback(async (beneficiarioId, fetchAll = false) => {
+    if (!ano || !mes) {
+      setError(true);
+      Alert.alert('Erro', 'Preencha os campos Ano e Mês.');
+      return;
     }
+
+    if (!/^\d{4}$/.test(ano) || !/^(0[1-9]|1[0-2])$/.test(mes)) {
+      setError(true);
+      Alert.alert('Erro', 'Ano ou mês inválido.');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      let allCards = [];
+      let totalFamilyBalance = 0;
+      if (fetchAll) {
+        for (const beneficiario of beneficiarios) {
+          const { data } = await api.get('/titulos/tit_benef', {
+            params: { beneficiario_id: parseInt(beneficiario.key), ano, mes },
+          });
+          if (data.rowCount > 0) {
+            const cards = data.rows.map(titulo => ({
+              balance: `R$${parseFloat(titulo.vl_total_titulo).toFixed(2)}`,
+              lastFour: formatDate(titulo.dt_vencimento) || '****',
+              expiry: formatDate(titulo.dt_geracao_titulo) || 'N/A',
+              valtype: titulo.tp_lancto || 'Desconhecido',
+            }));
+            allCards = [...allCards, ...cards];
+            totalFamilyBalance += cards.reduce((acc, card) => {
+              return acc + parseFloat(card.balance.replace('R$', '').replace(',', '.'));
+            }, 0);
+          }
+        }
+        setFamilyTotalBalance(totalFamilyBalance.toFixed(2));
+        if (!beneficiarioId) {
+          setSelectedCards(allCards);
+        }
+      } else {
+        const { data } = await api.get('/titulos/tit_benef', {
+          params: { beneficiario_id: parseInt(beneficiarioId), ano, mes },
+        });
+        if (data.rowCount > 0) {
+          const cards = data.rows.map(titulo => ({
+            balance: `R$${parseFloat(titulo.vl_total_titulo).toFixed(2)}`,
+            lastFour: formatDate(titulo.dt_vencimento) ,
+            expiry: formatDate(titulo.dt_geracao_titulo) || 'N/A',
+            valtype: titulo.tp_lancto || 'Desconhecido',
+          }));
+          setSelectedCards(cards);
+        } else {
+          Alert.alert('Aviso', 'Nenhum título encontrado.');
+          setSelectedCards([]);
+        }
+      }
+    } catch (err) {
+      
+      console.error('Erro ao buscar títulos:', err);
+      Alert.alert('Erro', `Erro ao carregar os títulos: ${err.message}`);
+      setSelectedCards([]);
+      setFamilyTotalBalance('0.00');
+    } finally {
+      setIsLoading(false);
+      setShowCards(true);
+    }
+  }, [ano, mes, beneficiarios]);
+
+  // Handle beneficiary selection
+  const handleBeneficiarySelect = useCallback((value) => {
+    const beneficiary = value;
+    setSelectedItem(beneficiary.key);
+    setSelectedCpf(beneficiary.cd_cpf || beneficiary.key);
+    setBeneficiaryName(beneficiary.value);
+    if (ano && mes) {
+      fetchTitulos(beneficiary.key);
+      fetchTitulos(beneficiarios, true); // Fetch family total
+    }
+  }, [ano, mes, fetchTitulos]);
+
+  const pesquisar = () => {
+    if (!selectedItem) {
+      setError(true);
+      Alert.alert('Erro', 'Selecione um beneficiário.');
+      return;
+    }
+    fetchTitulos(selectedItem);
+    fetchTitulos(beneficiarios, true); // Fetch family total
+  };
+
+  // Calculate total balance for selected beneficiary
+  const totalBalance = selectedCards.reduce((acc, card) => {
+    return acc + parseFloat(card.balance.replace('R$', '').replace(',', '.'));
+  }, 0).toFixed(2);
+
+  // Scroll to specific card
+  const scrollToCard = useCallback((i) => {
+    const newIndex = Math.min(Math.max(i, 0), selectedCards.length - 1);
+    flatListRef.current?.scrollToOffset({
+      offset: newIndex * (cardWidth + cardSpacing),
+      animated: true,
+    });
+    setIndex(newIndex);
+  }, [selectedCards.length]);
+
+  // Handle card change via indicator click
+  const handleCardChange = (i) => {
+    scrollToCard(i);
+  };
+
+  // Render card
+  const renderCard = ({ item }) => (
+    <View style={styles.card}>
+      <Text style={styles.cardText}>{item.valtype}</Text>
+      <Text style={styles.cardAmount}>{item.balance}</Text>
+      <Text style={styles.cardInfo}>Vencimento : {item.lastFour}</Text>
+      <Text style={styles.cardInfo}>Geração : {item.expiry}</Text>
+    </View>
+  );
+
+  const getInputStyle = (isValid) => ({
+    ...styles.inputContainer,
+    ...(isValid ? styles.dropdownError : {}),
+  });
+
+  // Generate sacado object based on selected beneficiary
+  const sacado = () => {
+    if (!selectedItem) {
+      return {
+        nm_sacado: 'Desconhecido',
+        nm_sacado_cpf: 'Desconhecido',
+        nm_sacado_logradouro: 'Desconhecido',
+        nm_sacado_numero: 'Desconhecido',
+        nm_sacado_complemento: 'Desconhecido',
+        nm_sacado_cidade: 'Desconhecido',
+        nm_sacado_estado: 'Desconhecido',
+        nm_sacado_cep: 'Desconhecido',
+      };
+    }
+
+    const selectedBeneficiary = beneficiarios.find(b => b.ic_beneficiario === 'T');
+    if (!selectedBeneficiary) {
+      return {
+        nm_sacado: 'Desconhecido',
+        nm_sacado_cpf: 'Desconhecido',
+        nm_sacado_logradouro: 'Desconhecido',
+        nm_sacado_numero: 'Desconhecido',
+        nm_sacado_complemento: 'Desconhecido',
+        nm_sacado_cidade: 'Desconhecido',
+        nm_sacado_estado: 'Desconhecido',
+        nm_sacado_cep: 'Desconhecido',
+      };
+    }
+
+    return {
+      nm_sacado: selectedBeneficiary.value || 'Desconhecido',
+      nm_sacado_cpf: formatCPF(selectedBeneficiary.cd_cpf) || 'Desconhecido',
+      nm_sacado_logradouro: selectedBeneficiary.nm_logradouro || 'Desconhecido',
+      nm_sacado_numero: selectedBeneficiary.cd_numero || 'Desconhecido',
+      nm_sacado_complemento: selectedBeneficiary.nm_complemento || 'Desconhecido',
+      nm_sacado_cidade: selectedBeneficiary.nm_cidade || 'Desconhecido',
+      nm_sacado_estado: selectedBeneficiary.sg_estado || 'Desconhecido',
+      nm_sacado_cep: formatCEP(selectedBeneficiary.cd_cep) || 'Desconhecido',
+    };
+  };
+
+  const handleSubmit = () => {
+    if (!selectedItem) {
+      Alert.alert('Erro', 'Selecione um beneficiário antes de gerar o boleto.');
+      return;
+    }
+    if (!ano || !mes) {
+      Alert.alert('Erro', 'Preencha os campos Ano e Mês.');
+      return;
+    }
+    if (!familyTotalBalance || parseFloat(familyTotalBalance) <= 0) {
+      Alert.alert('Erro', 'O saldo total da família deve ser maior que zero.');
+      return;
+    }
+
+    const sacadoData = sacado();
+    navigation.navigate('Boleto', {
+      familyTotalBalance: familyTotalBalance,
+      ano: ano,
+      mes: mes,
+      id: id,
+      sacado: sacadoData,
+    });
   };
 
   return (
+  <View style={{flex: 1}}>
     <View style={styles.container}>
-      <Text style={styles.title}>PDF Generator</Text>
-      <Button title="Generate and Save PDF" onPress={generatePDF} />
+      <ScrollView style={{ flex: 1, width: '100%' }}>
+        <View style={styles.filterRow}>
+          <SelectBeneficiario
+            selectedItem={selectedItem}
+            setSelectedItem={setSelectedItem}
+            onSelect={(item) => handleBeneficiarySelect(item)}
+            isEmpty={!selectedCpf && error}
+          />
+
+          <View style={{ flexDirection: 'row', width: '100%' }}>
+            <View style={{ width: '48%' }}>
+              <InputTexto
+                placeholderTextColor={theme.placeholderColor}
+                style={getInputStyle(error && !ano)}
+                text="Ano"
+                value={ano}
+                funcao={setAno}
+                max={4}
+                teclado="numeric"
+                icon={!ano && error ? 'calendar-alert' : 'calendar'}
+                redicon={!ano && error}
+              />
+            </View>
+
+            <View style={{ width: '48%', left: '4%' }}>
+              <InputTexto
+                style={getInputStyle(error && !mes)}
+                text="Mês"
+                value={mes}
+                funcao={setMes}
+                max={2}
+                teclado="numeric"
+                icon={!mes && error ? 'calendar-alert' : 'calendar'}
+                redicon={!mes && error}
+              />
+            </View>
+          </View>
+
+          <View style={{ flexDirection: 'row' }}>
+            {!ano && error && <Text style={styles.errorMessage}>Preencha o campo Ano</Text>}
+            {!mes && error && <Text style={[styles.errorMessage, { left: !ano ? 60 : 190 }]}>Preencha o campo Mês</Text>}
+          </View>
+        </View>
+
+        <TouchableOpacity style={styles.searchButton} onPress={pesquisar} disabled={isLoading}>
+          <Text style={styles.searchButtonText}>{isLoading ?  'Procurando Titulo...' : 'Pesquisar'}</Text>
+          <Ionicons name="search" size={24} color={theme.buttonTextColor} />
+        </TouchableOpacity>
+
+        {beneficiaryName && (
+          <>
+            <Text style={styles.balanceLabel}>{beneficiaryName}</Text>
+            <Text style={styles.balanceAmount}>R${totalBalance}</Text>
+          </>
+        )}
+
+        {showCards && selectedCards.length > 0 ? (
+          <AnimatedFlatList
+            ref={flatListRef}
+            data={selectedCards}
+            renderItem={renderCard}
+            keyExtractor={(_, i) => i.toString()}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            snapToInterval={cardWidth + cardSpacing}
+            snapToAlignment="center"
+            decelerationRate="fast"
+            onScroll={Animated.event(
+              [{ nativeEvent: { contentOffset: { x: scrollX } } }],
+              { useNativeDriver: true }
+            )}
+            scrollEventThrottle={16}
+            contentContainerStyle={{
+              paddingHorizontal: (Dimensions.get('window').width - cardWidth - 25) / 2,
+            }}
+            ItemSeparatorComponent={() => <View style={{ width: cardSpacing }} />}
+          />
+        ) : showCards ? (
+          <Text style={styles.noCards}>Nenhum cartão disponível</Text>
+        ) : null}
+
+        {showCards && selectedCards.length > 0 && (
+          <View style={styles.indicatorContainer}>
+            {selectedCards.map((_, i) => (
+              <TouchableOpacity key={i} onPress={() => handleCardChange(i)}>
+                <View style={[styles.indicator, index === i && styles.activeIndicator]} />
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
+
+        {beneficiaryName && (
+          <>
+            <Text style={styles.balanceLabel}>Total da Família</Text>
+            <Text style={styles.balanceAmount}>R${familyTotalBalance}</Text>
+          </>
+        )}
+
+        <View style={styles.actions}>
+          <TouchableOpacity onPress={handleSubmit} style={styles.actionButton}>
+            <Ionicons name="card-outline" size={24} color={theme.inputTextColor} />
+            <Text style={styles.actionText}>Gerar Boleto</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.actionButton}>
+            <Ionicons name="arrow-down-circle-outline" size={24} color={theme.inputTextColor} />
+            <Text style={styles.actionText}>Pagar Via Pix</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    </View>
+        <Rodape />
     </View>
   );
-};
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#f0f0f0',
-  },
-  title: {
-    fontSize: 24,
-    marginBottom: 20,
-  },
-});
-
-export default App;
+}

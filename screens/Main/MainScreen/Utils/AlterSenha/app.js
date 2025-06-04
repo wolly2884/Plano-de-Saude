@@ -11,7 +11,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import InputTexto from '../../../../../components/InputTexto';
 import Rodape from '../../../../../components/Rodape';
 import api from '../../../../../api/api';
-import { SelectList } from 'react-native-dropdown-select-list';
 import { useTheme } from '../../../../../context/ThemeContext';
 import { getStyles } from './Styles';
 import SelectBeneficiario  from '../../../../../components/SelectBeneficiario';

@@ -32,7 +32,9 @@ import AlterSenha                from './screens/Main/MainScreen/Utils/AlterSenh
 import AlterCad                  from './screens/Main/MainScreen/Utils/AlterCadastro/app'
 import AlterEmail                from './screens/Main/MainScreen/Utils/AlterEmail/app'
 import GeraImpRenda              from './screens/Main/MainScreen/Utils/IRPF/app'
+import Irpf                      from './screens/Main/MainScreen/Utils/IRPF/irpf'
 import Extrafin                  from './screens/Main/MainScreen/Utils/ExtraFin/index'
+import boleto                    from './screens/Main/MainScreen/Utils/ExtraFin/boleto'
 import ExtraCopart               from './screens/Main/MainScreen/Utils/ExtraCopart/index'
 import ExtraUtil                 from './screens/Main/MainScreen/Utils/ExtraUtil/index'
 import Dependente                from './screens/Main/MainScreen/Utils/InputDependente/index'
@@ -77,7 +79,7 @@ const App = () => {
             <Stack.Screen name="Manuais"                component={Manuais}             options={{ headerShown: true  }} />
             <Stack.Screen name="Cadastro"               component={Cadastro}            options={{ headerShown: true  }} />
             <Stack.Screen name="Atendimento ao Cliente" component={ChatBot}             options={{ headerShown: true  }} /> 
-            <Stack.Screen name="Chat Live"              component={Chatmessage}             options={{ headerShown: true  }} /> 
+            <Stack.Screen name="Chat Live"              component={Chatmessage}         options={{ headerShown: true  }} /> 
             <Stack.Screen name="Agendamento"            component={Agendamento}         options={{ headerShown: true  }} />
             <Stack.Screen name="Agenda"                 component={schedule}            options={{ headerShown: true  }} />  
             <Stack.Screen name="Receita"                component={Receita}             options={{ headerShown: true  }} />    
@@ -85,7 +87,9 @@ const App = () => {
             <Stack.Screen name="Bulario"                component={PDF}                 options={{ headerShown: true  }} />    
       
             <Stack.Screen name="Imposto de Renda"       component={GeraImpRenda}        options={{ headerShown: true  }} />
+            <Stack.Screen name="Irpf"                   component={Irpf}                options={{ headerShown: true  }} />
             <Stack.Screen name="Extrato Financerio"     component={Extrafin}            options={{ headerShown: true  }} />
+            <Stack.Screen name="Boleto"                 component={boleto}              options={{ headerShown: true  }} />
             <Stack.Screen name="Extrato Coparticipação" component={ExtraCopart}         options={{ headerShown: true  }} />
             <Stack.Screen name="Extrato Utilização"     component={ExtraUtil}           options={{ headerShown: true  }} />
       

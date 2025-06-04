@@ -3,7 +3,21 @@ import { StyleSheet, Text, View, ScrollView } from 'react-native'
 import moment from 'moment';
 import 'moment/locale/pt-br';
 import Date from './date'
-import './calendarLocale'; // Caminho relativo conforme seu projeto
+import { LocaleConfig } from 'react-native-calendars';
+import './calendarLocale'; // Importando o arquivo de configuração do calendário
+import 'moment/locale/pt-br'; // Importando o locale do moment.js
+
+LocaleConfig.locales['pt-br'] = {
+  monthNames: [
+    'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+    'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+  ],
+  monthNamesShort: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
+  dayNames: ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'],
+  dayNamesShort: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'],
+  today: 'Hoje',
+};
+LocaleConfig.defaultLocale = 'pt-br';
 
 moment.locale('pt-br');
 

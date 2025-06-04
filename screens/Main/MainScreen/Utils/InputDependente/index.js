@@ -220,7 +220,7 @@ const App = ({ navigation }) => {
         <ScrollView contentContainerStyle={{ paddingBottom: 150 }}>
           {/* Seção de Dados do Beneficiário */}
           <CollapsibleSection
-            title={countErrors('beneficiario') > 0 ? `Dados do Beneficiário (${countErrors('beneficiario')} erros)` : 'Dados do Beneficiário'}
+            title={countErrors('beneficiario') > 0 ? `Beneficiário (${countErrors('beneficiario')} erros)` : 'Beneficiário'}
             isOpen={openSection === 'beneficiario'}
             onToggle={() => setOpenSection(openSection === 'beneficiario' ? '' : 'beneficiario')}
             theme={theme}
@@ -302,7 +302,7 @@ const App = ({ navigation }) => {
 
           {/* Seção de Dados do Endereço */}
           <CollapsibleSection
-            title={countErrors('endereco') > 0 ? `Dados do Endereço (${countErrors('endereco')} erros)` : 'Dados do Endereço'}
+            title={countErrors('endereco') > 0 ? `Endereço (${countErrors('endereco')} erros)` : 'Endereço'}
             isOpen={openSection === 'endereco'}
             onToggle={() => setOpenSection(openSection === 'endereco' ? '' : 'endereco')}
             theme={theme}
@@ -365,7 +365,7 @@ const App = ({ navigation }) => {
 
           {/* Seção de Dados do Plano */}
           <CollapsibleSection
-            title={countErrors('plano') > 0 ? `Dados do Plano (${countErrors('plano')} erros)` : 'Dados do Plano'}
+            title={countErrors('plano') > 0 ? `Plano (${countErrors('plano')} erros)` : 'Plano'}
             isOpen={openSection === 'plano'}
             onToggle={() => setOpenSection(openSection === 'plano' ? '' : 'plano')}
             theme={theme}

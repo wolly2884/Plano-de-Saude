@@ -12,7 +12,6 @@ import api from '../../../../api/api';
 import dateUtils from '../../../../api/functions';
 import Logointro from '../../../../components/logointro';
 
-
 const App = ({ navigation }) => {
   const { theme, isThemeLoaded } = useTheme();
   const styles = getStyles(theme);

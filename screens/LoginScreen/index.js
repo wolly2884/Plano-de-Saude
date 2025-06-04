@@ -1,29 +1,132 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Alert, Platform } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Alert, Platform, ActivityIndicator } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { cpf } from 'cpf-cnpj-validator';
 import api from '../../api/api';
 import Modal from 'react-native-modal';
 import { useTheme } from '../../context/ThemeContext';
-import  {getStyles} from './Styles'; // <-- import separado
+import { getStyles } from './Styles';
 
-const App = ({ navigation }) => {
+const LoginScreen = ({ navigation }) => {
   const [login, setLogin] = useState('');
   const [password, setPassword] = useState('');
-  const [storedCPF, setstoredCPF] = useState('');
-  const [storedEmail, setstoredEmail] = useState('');
-  const [storedPassword, setstoredPassword] = useState('');
+  const [storedCPF, setStoredCPF] = useState('');
+  const [storedEmail, setStoredEmail] = useState('');
+  const [storedPassword, setStoredPassword] = useState('');
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const { theme, isThemeLoaded } = useTheme();
+  const [loading, setLoading] = useState(false);
+  const { theme } = useTheme();
   const styles = getStyles(theme);
+
+  const validCPF = () => {
+    const onlyDigits = login.replace(/\D/g, '');
+    if (onlyDigits.length === 11 && cpf.isValid(onlyDigits)) {
+      setLogin(onlyDigits);
+      return true;
+    }
+    return false;
+  };
+
+  const validEmail = () => {
+    const email = login.toLowerCase();
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (emailRegex.test(email)) {
+      setLogin(email);
+      return true;
+    }
+    return false;
+  };
+
+  const storeUserData = async (data) => {
+    const {
+      cd_cpf,
+      ds_email,
+      cd_password,
+      cd_age,
+      cd_cardnumber,
+      ds_healthplan,
+      nm_beneficiario,
+      cd_cns,
+      id,
+    } = data;
+
+    await AsyncStorage.multiSet([
+      ['CPF', cd_cpf],
+      ['age', cd_age],
+      ['cardNumber', cd_cardnumber],
+      ['healthPlan', ds_healthplan],
+      ['username', nm_beneficiario],
+      ['CNS', cd_cns],
+      ['ID', id.toString()],
+      ['Email', ds_email],
+    ]);
+  };
+
+  const formatBeneficiaries = (rows) =>
+    rows.map(item => ({
+      key: item.id,
+      value: item.nm_beneficiario,
+      nm_beneficiario: item.nm_beneficiario,
+      cd_cpf: item.cd_cpf,
+      cd_password: item.cd_password,
+      cd_age: item.cd_age,
+      ic_estado_civil: item.ic_estado_civil,
+      ic_sexo: item.ic_sexo,
+      ds_email: item.ds_email,
+      cd_celular: item.cd_celular,
+      nm_logradouro: item.nm_logradouro,
+      cd_numero: item.cd_numero,
+      nm_complemento: item.nm_complemento,
+      nm_cidade: item.nm_cidade,
+      cd_cep: item.cd_cep,
+      sg_estado: item.sg_estado,
+      cd_cardnumber: item.cd_cardnumber,
+      ds_healthplan: item.ds_healthplan,
+      cd_cns: item.cd_cns,
+      dt_inclusao: item.dt_inclusao,
+    }));
+
+  const validateLogin = async () => {
+    if (validCPF() || validEmail()) {
+      try {
+        const response = await api.get(`Beneficiario/find/${login}`);
+        const { rowCount, rows } = response.data;
+
+        if (rowCount > 0) {
+          const user = rows[0];
+          setStoredCPF(user.cd_cpf);
+          setStoredEmail(user.ds_email);
+          setStoredPassword(user.cd_password);
+
+          await storeUserData(user);
+          await AsyncStorage.setItem('beneficiaries', JSON.stringify(formatBeneficiaries(rows)));
+
+          return true;
+        } else {
+          Alert.alert('Erro', 'Usuário não encontrado.');
+          return false;
+        }
+      } catch (error) {
+        console.error('Erro na API:', error);
+        Alert.alert('Erro', 'Não foi possível validar os dados.');
+        return false;
+      }
+    } else if (login.trim().length > 0) {
+      Alert.alert('Erro', 'Login inválido.');
+    }
+    return false;
+  };
 
   const handleLogin = async () => {
     try {
-      if ((login === storedCPF && password === storedPassword) || (login === storedEmail && password === storedPassword) || Platform.OS === 'web') {
-        // Verifica se o modal deve ser exibido
-        const biometricFlag = await AsyncStorage.getItem('biometricConfigured');
-        
-        if (biometricFlag !== null && !biometricFlag) {
+      const biometricFlag = await AsyncStorage.getItem('biometricConfigured');
+
+      if (
+        (login === storedCPF && password === storedPassword) ||
+        (login === storedEmail && password === storedPassword) ||
+        Platform.OS === 'web'
+      ) {
+        if (biometricFlag !== null && biometricFlag === 'false') {
           setIsModalVisible(true);
         } else {
           navigation.navigate('pagina');
@@ -32,72 +135,16 @@ const App = ({ navigation }) => {
         Alert.alert('Credenciais inválidas');
       }
     } catch (error) {
-      console.error('Erro ao recuperar ou armazenar os dados:', error);
-      Alert.alert('Erro', 'Não foi possível realizar o login. Tente novamente.', [
-        { text: 'OK' },
-      ]);
+      console.error('Erro ao validar login:', error);
+      Alert.alert('Erro', 'Não foi possível realizar o login. Tente novamente.');
     }
-  };
-
-  const validateLogin = async () => {
-    if (validCPF() || validEmail()) {
-      let userData = await api.get('Beneficiario/find/' + login);
-
-      const sCPF = userData.data.rows[0].cd_cpf;
-      setstoredCPF(sCPF);
-
-      const sEmail = userData.data.rows[0].ds_email;
-      setstoredEmail(sEmail);
-
-      const sPassword = userData.data.rows[0].cd_password;
-      setstoredPassword(sPassword);
-
-      const sAge        = userData.data.rows[0].cd_age;
-      const sCardNumber = userData.data.rows[0].cd_cardnumber;
-      const sHealthPlan = userData.data.rows[0].ds_healthplan;
-      const sNome       = userData.data.rows[0].nm_beneficiario;
-      const sCNS        = userData.data.rows[0].cd_cns;
-      const sID         = userData.data.rows[0].id.toString();
-
-      //await AsyncStorage.clear();
-      await AsyncStorage.setItem('CPF', sCPF);
-      await AsyncStorage.setItem('age', sAge);
-      await AsyncStorage.setItem('cardNumber', sCardNumber);
-      await AsyncStorage.setItem('healthPlan', sHealthPlan);
-      await AsyncStorage.setItem('username', sNome);
-      await AsyncStorage.setItem('CNS', sCNS);
-      await AsyncStorage.setItem('ID', sID);
-      await AsyncStorage.setItem('Email', sEmail);
-
-      return true;
-    } else if (login.length !== 0) {
-      Alert.alert('Erro', 'Login inválido.');
-      return false;
-    }
-    return false;
-  };
-
-  const validCPF = () => {
-    const formattedCPF = cpf.format(login);
-    if (formattedCPF.length === 14 && cpf.isValid(formattedCPF)) {
-      setLogin(login);
-      return true;
-    }
-    return false;
-  };
-
-  const validEmail = () => {
-    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    if (emailRegex.test(login)) {
-      setLogin(login);
-      return true;
-    }
-    return false;
   };
 
   const handleLoginPress = async () => {
-    if (login.trim() !== '' && password.trim() !== '') { // Check if login and password are not empty
+    if (login.trim() && password.trim()) {
+      setLoading(true);
       const isValid = await validateLogin();
+      setLoading(false);
       if (isValid) {
         handleLogin();
       }
@@ -119,12 +166,27 @@ const App = ({ navigation }) => {
 
   return (
     <View style={styles.loginsearchBar}>
-      <TextInput style={styles.logininput} placeholder="Insira seu E-mail ou CPF" value={login} onChangeText={setLogin} onBlur={validateLogin} />
-      <TextInput style={styles.logininput} placeholder="Insira sua senha" secureTextEntry value={password} onChangeText={setPassword} />
+      <TextInput
+        style={styles.logininput}
+        placeholder="Insira seu E-mail ou CPF"
+        value={login}
+        onChangeText={setLogin}
+        onBlur={validateLogin}
+        autoCapitalize="none"
+      />
+      <TextInput
+        style={styles.logininput}
+        placeholder="Insira sua senha"
+        secureTextEntry
+        value={password}
+        onChangeText={setPassword}
+      />
 
       <TouchableOpacity style={styles.loginnavBar} onPress={handleLoginPress}>
         <Text style={styles.loginnavItem}>Entrar</Text>
       </TouchableOpacity>
+
+      {loading && <ActivityIndicator size="large" color="#007bff" style={{ marginTop: 10 }} />}
 
       <TouchableOpacity onPress={() => navigation.navigate('Recuperar Senha')}>
         <Text style={styles.loginTexto}>Esqueceu sua Senha</Text>
@@ -135,7 +197,7 @@ const App = ({ navigation }) => {
       </TouchableOpacity>
 
       {/* Modal de confirmação */}
-      <Modal isVisible={isModalVisible} backdropOpacity={1.5}>
+      <Modal isVisible={isModalVisible} backdropOpacity={0.7}>
         <View style={styles.modalContainer}>
           <Text style={styles.modalText}>Deseja ativar o uso da biometria para login futuro?</Text>
           <TouchableOpacity style={styles.modalButton} onPress={handleModalConfirm}>
@@ -150,4 +212,4 @@ const App = ({ navigation }) => {
   );
 };
 
-export default App;
+export default LoginScreen;

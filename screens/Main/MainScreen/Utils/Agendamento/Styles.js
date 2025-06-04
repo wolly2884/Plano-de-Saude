@@ -1,210 +1,162 @@
-import { StyleSheet } from 'react-native';
-  
-export const styles = StyleSheet.create({
-    container:{
-        flex: 1,
-        backgroundColor: 'white',
-        padding: 20
-    },
-    scrollViewContent:{
-        top: 90,
-    },
-    View:{
-        backgroundColor: 'white', 
-        alignSelf: 'flex-start', 
-        paddingHorizontal: 3, 
-        marginStart: 20, 
-        zIndex: 1, 
-        elevation: 1, 
-        position: 'absolute', 
-        top: 12
-    },
-    Text:{
-        backgroundColor: 'white', 
-        alignSelf: 'flex-start', 
-        paddingHorizontal: 3, 
-        marginStart: 20, 
-        zIndex: 1, 
-        elevation: 1, 
-        position: 'absolute', 
-        top: -12, 
-        left: 10
-    },
-    View2:{
-        alignItems: 'center', 
-        left: 1, 
-        height: 60, 
-        width: '97%' , 
-        borderWidth: 1, 
-        borderRadius: 10
-    },
-    Cadinput: {
-      backgroundColor: '#f2f2f2',
-      borderRadius: 5,
-      marginBottom: 15,
-    },
-    Cadbutton: {
-      backgroundColor: '#0d729c',
-      borderRadius: 5,
-      padding: 15,
-      alignItems: 'center',
-      marginBottom: 40
-    },
-    CadbuttonText: {
-      color: '#fff',
-      fontWeight: 'bold',
-      fontSize: 16,
-    },
-    errorMessage:{
-        fontSize: 10,
-        color: 'red', 
-        left: 20,
-        top: -1
-    },
+import { heightPercentageToDP as hp, widthPercentageToDP as wp } from 'react-native-responsive-screen';
+
+export const getStyles = (theme) => {
+  return {
     container: {
       flex: 1,
+      backgroundColor: theme.backgroundColor,
+      alignItems: 'center',
       justifyContent: 'center',
-      backgroundColor: '#d6ffff',
     },
-    modalContainer: {
-      flex: 1,
+    header: { 
+      position: 'absolute', 
+      fontSize: 28,
+      color: theme.textColor,      
+      top: 0 
+    },
+    button: {
+      backgroundColor: theme.buttonBackground,
+      borderRadius: 30,
+      height: 40,
       justifyContent: 'center',
       alignItems: 'center',
-      backgroundColor: 'rgba(0,0,0,0.5)',
-    },
-    modalContent: {
-      width: '80%',
-      backgroundColor: 'white',
-      borderRadius: 10,
-      padding: 20,
-    },
-    modalTitle: {
-      fontSize: 20,
-      fontWeight: 'bold',
-    },
-    input: {
-      height: 40,
-      borderColor: 'gray',
+      marginTop: hp('-1%'),
       borderWidth: 1,
-      marginBottom: 20,
-      paddingHorizontal: 20,
-      width: '120%'
-    },
-    buttonContainer: {
+      borderColor: theme.buttonBackground,
       flexDirection: 'row',
-      justifyContent: 'space-between',
+    },  
+    Image: {
+      position: 'absolute',
+      top: 0,
+      width: '54%',
+      height: '33%',
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginTop: hp('4%'),
+    },
+    scrollView: {
+      position: 'absolute',
+      bottom: 0,
+      top: hp('10%'), 
+      height: '98%', 
+      width: '98%' 
+    },
+    beneficiario: { 
+      marginTop: hp('24%'), 
+      width: '98%' 
+    },
+    SelectList: { 
+      width: '98%' 
+    },
+    buttonavancar: {
+      width: '38%',
+      position: 'absolute',
+      bottom: 50,
+      right: 10,
+    },
+    buttonText: {
+      color: theme.buttonTextColor,
+      fontSize: 20,
+    },
+    // Agendamento Styles
+    button_horario: { 
+      marginLeft: 3, 
+      marginRight: 3 
+    },
+    horarioContainer: { 
+      top: 10, 
+      width: 90, 
+      height: 30,    
+      borderRadius: 20, 
+      alignItems: 'center', 
+      alignContent: 'center', 
+      flexDirection: 'row',     
+      justifyContent: 'space-around', 
+      padding: 5 
+    },
+    button_horario_text: {
+      fontSize: 13, 
+      fontWeight: 'bold',      
+      fontStyle: 'italic',      
+    },
+    horatioimage: {
+      width: 20,
+      height: 20,
+      marginRight: 5,
+    },
+    headerContainer: { 
+      borderWidth: 1, 
+      width: "100%", 
+      height: '40%'
+    },
+    headerImage: { 
+      width: '40%', 
+      height: '90%', 
+      position: 'absolute', 
+      bottom: 0, 
+      right: 10 
+    },
+    headerText: {
+      fontSize: 20,
+      color: theme.textColor,
+      textAlign: 'left',
+      marginTop: 10,
+      left: 5,
+    },
+    buttonContainer: { 
+      width: '10%', 
+      height: '10%' 
+    },
+    buttonIcon: { 
+      width: 30, 
+      height: 30, 
+      top: 50, 
+      left: 10, 
+    },
+    contato: { 
+      position: 'absolute', 
+      top: 50, 
+      left: 5 
+    },
+    headerTextContainer: { 
+      flex: 1, 
+      marginTop: 50 
+    },
+    buttonHeader: { 
+      flexDirection: 'row',  
+      position: 'absolute', 
+      bottom: 110, 
+      width: '100%', 
+      padding: 10 
     },
     modal: {
       justifyContent: 'flex-end',
       margin: 0,
-      bottom: -40
     },
     modalContainer: {
       backgroundColor: 'white',
-      padding: 20,
       borderTopLeftRadius: 20,
       borderTopRightRadius: 20,
+      padding: 20,
+      height: '30%',
     },
-    modalTitle: {
-      fontSize: 20,
-      fontWeight: 'bold',
-      marginBottom: 10,
-      justifyContent: 'left'
+    modalContent: {
+      flex: 1,
+      justifyContent: 'center',
     },
-    button:{
-      borderRadius: 20,
-      bottom: 60,
-      borderRadius: 200,
+    input: {
       borderWidth: 1,
-      width: 45,
-      height: 45,
-      left: 100,
-      alignSelf: 'flex-end'
+      borderColor: '#ccc',
+      borderRadius: 10,
+      padding: 10,
+      fontSize: 16,
+      color: '#000',
+      height: 100,
     },
-    Icon:{
-      alignSelf: 'center', 
-      bottom: 0, 
-      top: 10, 
-      left: -3 
+    iconButton: {
+      position: 'absolute',
+      right: 20,
+      bottom: 20,
     },
-    ViewText:{ 
-      flexDirection: 'row', 
-      height: '5.5%', 
-      width: '50%', 
-      bottom: 50, 
-      top: 10 },
-      
-      modal: {
-        justifyContent: 'flex-end',
-        margin: 0,
-        bottom: 20
-      },
-      modalContainer: {
-        backgroundColor: 'white',
-        padding: 30,
-        borderTopLeftRadius: 20,
-        borderTopRightRadius: 20,
-      },
-      modalTitle: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        marginBottom: 10,
-        justifyContent: 'left'
-      },
-      button:{
-        borderRadius: 20,
-        bottom: 60,
-        borderRadius: 200,
-        borderWidth: 1,
-        width: 45,
-        height: 45,
-        left: 100,
-        alignSelf: 'flex-end'
-      },
-      Icon:{
-        alignSelf: 'center', 
-        bottom: 0, 
-        top: 10, 
-        left: -3 
-      },
-      ViewText:{ 
-        flexDirection: 'row', 
-        height: '5.5%', 
-        width: '50%', 
-        bottom: 50, 
-        top: 10 
-      },
-      iconButton:{
-        left: 0
-      },
-      modalContainer: {
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: 'rgba(0,0,0,0.0)',
-        bottom: 40
-      },
-      modalContent: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        borderTopWidth: 1,
-        borderTopColor: '#EEEEEE',
-        backgroundColor: 'white',
-        padding: 10,
-        borderTopLeftRadius: 20,
-        borderTopRightRadius: 20,
-        top: 10
-
-      },
-      modalTitle: {
-        fontSize: 20,
-        fontWeight: 'bold',
-      },
-      input: {
-        flex: 1,
-        height: 40,
-        marginHorizontal: 5,
-        paddingHorizontal: 8,
-        backgroundColor: '#F0F0F0',
-        borderRadius: 20,
-      }
-    });
+  };
+};

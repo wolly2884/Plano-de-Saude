@@ -120,6 +120,8 @@ const App = ({ navigation }) => {
   };
 
   const handleLoginPress = async () => {
+      console.log('Campos senhas', 'storedPassword: ' + storedPassword + ' login: ' + login + ' password: ' + password);
+
     if (login.trim() && password.trim()) {
       const isValid = await validateLogin();
       console.log(isValid);
@@ -130,7 +132,7 @@ const App = ({ navigation }) => {
         Alert.alert('Credenciais inválidas', 'Verifique seu CPF, e-mail ou senha.');
       }
     } else {
-      Alert.alert('Campos vazios', 'Por favor, preencha o login e a senha.');
+      Alert.alert('Campos vazios', 'Por favor, preencha o login e a senha 1.');
     }
   };
 

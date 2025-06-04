@@ -86,11 +86,6 @@ const ChatScreen = ({ route }) => {
     await sendMessage(initialMessage);
   };
 
-  const handleFocusInput = () => {
-    inputRef.current?.focus();
-    flatListRef.current?.scrollToEnd({ animated: true });
-  };
-
   const handlePickFile = async () => {
     try {
       const result = await DocumentPicker.getDocumentAsync({

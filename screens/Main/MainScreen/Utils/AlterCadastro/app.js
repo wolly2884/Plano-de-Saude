@@ -1,5 +1,4 @@
 import React, { useState, useCallback } from 'react';
-import { useFocusEffect } from '@react-navigation/native';
 import {
   View,
   Text,
@@ -8,7 +7,6 @@ import {
   ScrollView,
   SafeAreaView,
 } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getStyles } from './Styles';
 import InputTexto from '../../../../../components/InputTexto';
 import Rodape from '../../../../../components/Rodape';
@@ -23,7 +21,6 @@ import {
   validateFields,
   validateAndFormatDate,
 } from '../../../../../components/validations';
-import { SelectList } from 'react-native-dropdown-select-list';
 import SelectBeneficiario  from '../../../../../components/SelectBeneficiario';
 
 // Componente para seções expansíveis
@@ -210,8 +207,6 @@ const App = ({ navigation }) => {
 
   // Handle beneficiary selection
   const selecionado = (beneficiary) => {
-    
-    console.log('Beneficiário selecionado:', beneficiary);
     if (beneficiary) {
       setFormData({
         nmBeneficiario: beneficiary.nm_beneficiario || '',
@@ -254,7 +249,7 @@ const App = ({ navigation }) => {
 
           {/* Seção de Dados do Beneficiário */}
           <CollapsibleSection
-            title={countErrors('beneficiario') > 0 ? `Dados do Beneficiário (${countErrors('beneficiario')} erros)` : 'Dados do Beneficiário'}
+            title={countErrors('beneficiario') > 0 ? `Beneficiário (${countErrors('beneficiario')} erros)` : 'Beneficiário'}
             isOpen={openSection === 'beneficiario'}
             onToggle={() => setOpenSection(openSection === 'beneficiario' ? '' : 'beneficiario')}
             theme={theme}
@@ -344,7 +339,7 @@ const App = ({ navigation }) => {
 
           {/* Seção de Dados do Endereço */}
           <CollapsibleSection
-            title={countErrors('endereco') > 0 ? `Dados do Endereço (${countErrors('endereco')} erros)` : 'Dados do Endereço'}
+            title={countErrors('endereco') > 0 ? `Endereço (${countErrors('endereco')} erros)` : 'Endereço'}
             isOpen={openSection === 'endereco'}
             onToggle={() => setOpenSection(openSection === 'endereco' ? '' : 'endereco')}
             theme={theme}
@@ -413,7 +408,7 @@ const App = ({ navigation }) => {
 
           {/* Seção de Dados do Plano */}
           <CollapsibleSection
-            title={countErrors('plano') > 0 ? `Dados do Plano (${countErrors('plano')} erros)` : 'Dados do Plano'}
+            title={countErrors('plano') > 0 ? `Plano (${countErrors('plano')} erros)` : 'Plano'}
             isOpen={openSection === 'plano'}
             onToggle={() => setOpenSection(openSection === 'plano' ? '' : 'plano')}
             theme={theme}

@@ -1,15 +1,28 @@
 import React, { useState, useCallback, useRef, useMemo } from 'react';
-import { TouchableOpacity, Text, ScrollView, SafeAreaView, Image, View, KeyboardAvoidingView, Platform, ActivityIndicator, Alert } from 'react-native';
-import { SelectList } from 'react-native-dropdown-select-list';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
+import {
+  TouchableOpacity,
+  Text,
+  ScrollView,
+  SafeAreaView,
+  Image,
+  View,
+  KeyboardAvoidingView,
+  Platform,
+  ActivityIndicator,
+  Alert,
+} from 'react-native';
+
+import { SelectList } from 'react-native-dropdown-select-list';
 import { useTheme } from '../../../../../context/ThemeContext';
 import InputTexto from '../../../../../components/InputTexto';
 import Rodape from '../../../../../components/Rodape';
-import api from '../../../../../api/api';
 import { getStyles } from './chatstyle';
 import enioEmail from '../../../../../assets/enioemail.png';
+import SelectBeneficiario from '../../../../../components/SelectBeneficiario';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
+// Opções de feedback
 const feedbackOptions = [
   { key: '1', value: 'Reclamação' },
   { key: '2', value: 'Sugestão' },
@@ -17,6 +30,9 @@ const feedbackOptions = [
   { key: '4', value: 'Outros' },
 ];
 
+ 
+
+// Componente de input reutilizável
 const FormInput = ({ field, label, value, onChange, icon, max, teclado, multiline, numberOfLines, inputRef, onFocus, styles, errors, theme }) => (
   <View style={styles.section}>
     <InputTexto
@@ -60,6 +76,8 @@ const App = ({ navigation }) => {
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [isEmailEdited, setIsEmailEdited] = useState(false);
+  const [selectedItem, setSelectedItem] = useState('');
+  const [nm_titular, setNmTitular] = useState('');
 
   const { theme } = useTheme();
   const styles = useMemo(() => getStyles(theme), [theme]);
@@ -68,105 +86,73 @@ const App = ({ navigation }) => {
 
   useFocusEffect(
     useCallback(() => {
-      let isActive = true;
-      const fetchData = async () => {
+      async function fetchUserData() {
         try {
-          setIsLoading(true);
-          const [storedCardNumber, storedEmail, storedUsername, storedID, cachedBeneficiaries] = await Promise.all([
-            AsyncStorage.getItem('cardNumber'),
-            AsyncStorage.getItem('Email'),
-            AsyncStorage.getItem('username'),
-            AsyncStorage.getItem('ID'),
-            AsyncStorage.getItem('beneficiaries'),
-          ]);
-
-          if (isActive) {
-            setFormData((prev) => ({
-              ...prev,
-              email: storedEmail || '',
-              titular: storedUsername || '',
-              carteirinha: storedCardNumber || '',
-            }));
-
-            if (cachedBeneficiaries) {
-              setBeneficiaries(JSON.parse(cachedBeneficiaries));
-            } else {
-              const response = await api.get(`/Beneficiario/get/${storedID}`);
-              const { rowCount, rows } = response.data;
-
-              if (rowCount > 0) {
-                const beneficiaryData = rows.map((item) => ({
-                  key: item.id,
-                  value: item.nm_beneficiario,
-                  nome: item.nm_beneficiario,
-                  cpf: item.cd_cpf,
-                  email: item.ds_email,
-                  cardnumber: item.cd_cardnumber,
-                }));
-                setBeneficiaries(beneficiaryData);
-                await AsyncStorage.setItem('beneficiaries', JSON.stringify(beneficiaryData));
-              } else {
-                setErrors((prev) => ({ ...prev, beneficiary: 'Nenhum beneficiário encontrado' }));
-              }
-            }
-          }
+          const user = await AsyncStorage.getItem('user');
+          setNmTitular(user ? JSON.parse(user).nm_beneficiario : '');
         } catch (error) {
-          if (isActive) {
-            let errorMessage = 'Erro ao carregar dados. Tente novamente.';
-            if (error.response?.status === 404) {
-              errorMessage = 'Beneficiários não encontrados.';
-            } else if (error.message.includes('Network')) {
-              errorMessage = 'Falha na conexão. Verifique sua rede.';
-            }
-            setErrors((prev) => ({ ...prev, api: errorMessage }));
-          }
-        } finally {
-          if (isActive) setIsLoading(false);
+          console.error('Error fetching user data:', error);
         }
-      };
-      fetchData();
-      return () => {
-        isActive = false;
-      };
+      }
+
+      fetchUserData();
     }, [])
   );
 
-  const validateForm = () => {
+  // Função para validar CPF
+  const validateCPF = (cpf) => {
+    const cleanCPF = cpf.replace(/\D/g, '');
+    if (cleanCPF.length !== 11) return false;
+    // Lógica adicional de validação de CPF pode ser adicionada aqui
+    return true;
+  };
+
+  // Função para limpar strings
+  const cleanString = (str) => (str ? str.trim() : '');
+
+  // Validação do formulário
+  const validateForm = useCallback(() => {
     const newErrors = {};
     const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+
     if (!formData.feedbackType) newErrors.feedbackType = 'Selecione o tipo de feedback';
     if (!selectedBeneficiary) newErrors.beneficiary = 'Selecione o beneficiário';
     if (!formData.email.trim() || !emailRegex.test(formData.email)) newErrors.email = 'Email inválido';
     if (!formData.titular.trim()) newErrors.titular = 'Titular é obrigatório';
     if (!formData.carteirinha.trim()) newErrors.carteirinha = 'Número da carteirinha é obrigatório';
+    if (!formData.cpf.trim() || !validateCPF(formData.cpf)) newErrors.cpf = 'CPF inválido';
     if (!formData.message.trim()) newErrors.message = 'Descrição é obrigatória';
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
-  };
+  }, [formData, selectedBeneficiary]);
 
+  // Envio do formulário
   const handleSubmit = async () => {
     if (validateForm()) {
       setIsLoading(true);
       try {
         const formDataToSend = new FormData();
-        formDataToSend.append('message', formData.message);
-        formDataToSend.append('name', selectedBeneficiary?.nome || '');
-        formDataToSend.append('email', formData.email);
-        formDataToSend.append('titular', formData.titular);
-        formDataToSend.append('carteirinha', formData.carteirinha);
-        formDataToSend.append('feedbackType', formData.feedbackType);
-        formDataToSend.append('cpf', formData.cpf);
+        formDataToSend.append('message', cleanString(formData.message));
+        formDataToSend.append('name', cleanString(formData.nome));
+        formDataToSend.append('email', cleanString(formData.email));
+        formDataToSend.append('titular', cleanString(formData.titular));
+        formDataToSend.append('carteirinha', cleanString(formData.carteirinha));
+        formDataToSend.append('feedbackType', cleanString(formData.feedbackType));
+        formDataToSend.append('cpf', cleanString(formData.cpf));
 
-        Alert.alert('Sucesso', 'Formulário enviado com sucesso!');
-        await navigation.navigate('Chat Live', {
-          message: formData.message,
-          name: selectedBeneficiary?.nome || '',
-          email: formData.email,
-          titular: formData.titular,
-          carteirinha: formData.carteirinha,
-          feedbackType: formData.feedbackType,
-          cpf: formData.cpf,
+        // Simulação de envio para API
+        // await api.post('/submit', formDataToSend);
+
+        Alert.alert('Sucesso', 'Formulário enviado com sucesso!', [{ text: 'OK' }]);
+        navigation.navigate('Chat Live', {
+          message: cleanString(formData.message),
+          name: cleanString(formData.nome),
+          email: cleanString(formData.email),
+          titular: cleanString(formData.titular),
+          carteirinha: cleanString(formData.carteirinha),
+          feedbackType: cleanString(formData.feedbackType),
+          cpf: cleanString(formData.cpf),
         });
       } catch (error) {
         let errorMessage = 'Erro ao enviar formulário. Tente novamente.';
@@ -181,10 +167,13 @@ const App = ({ navigation }) => {
             case 500:
               errorMessage = 'Erro no servidor. Tente novamente mais tarde.';
               break;
+            default:
+              errorMessage = 'Erro inesperado. Tente novamente.';
           }
         } else if (error.message.includes('Network')) {
           errorMessage = 'Sem conexão com a internet.';
         }
+        Alert.alert('Erro', errorMessage, [{ text: 'OK' }]);
         setErrors((prev) => ({ ...prev, api: errorMessage }));
       } finally {
         setIsLoading(false);
@@ -192,46 +181,62 @@ const App = ({ navigation }) => {
     }
   };
 
-  const handleInputChange = (field, value) => {
+  // Manipulação de mudança de input
+  const handleInputChange = useCallback((field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     setErrors((prev) => ({ ...prev, [field]: null }));
-  };
+  }, []);
 
-  const handleBeneficiarySelect = (value) => {
-    const beneficiary = beneficiaries.find((item) => item.value === value);
+  // Manipulação de seleção de beneficiário
+  const handleBeneficiarySelect = useCallback( (value) => {
+    const beneficiary = value;
     setSelectedBeneficiary(beneficiary || null);
     setFormData((prev) => ({
       ...prev,
-      carteirinha: beneficiary?.cardnumber || '',
-      email: beneficiary?.email || '',
-      cpf: beneficiary?.cpf || '',
+      nome: cleanString(beneficiary?.nm_beneficiario),
+      carteirinha: cleanString(beneficiary?.cd_cardnumber),
+      email: cleanString(beneficiary?.ds_email),
+      cpf: cleanString(beneficiary?.cd_cpf),
+      titular: cleanString(nm_titular),
     }));
-    setErrors((prev) => ({ ...prev, beneficiary: null, carteirinha: null, email: null, cpf: null }));
-    setIsEmailEdited(!!beneficiary?.email);
-  };
 
-  const handleEmailChange = (text) => {
-    setFormData((prev) => ({ ...prev, email: text }));
+    setErrors((prev) => ({ ...prev, beneficiary: null, carteirinha: null, email: null, cpf: null }));
+    setIsEmailEdited(!!beneficiary?.ds_email);
+  }, [nm_titular]); // Add nm_titular to dependencies
+
+  // Manipulação de mudança de email
+  const handleEmailChange = useCallback((text) => {
+    setFormData((prev) => ({ ...prev, email: cleanString(text) }));
     setIsEmailEdited(true);
     setErrors((prev) => ({ ...prev, email: null }));
-  };
+  }, []);
 
-  const handleMessageClick = () => {
+  // Manipulação de clique na mensagem
+  const handleMessageClick = useCallback(() => {
     if (messageInputRef.current && scrollViewRef.current) {
       messageInputRef.current.focus();
       scrollViewRef.current.scrollTo({ y: formData.messageInputY, animated: true });
     }
-  };
+  }, [formData.messageInputY]);
 
   return (
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={{ flex: 1 }}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 20}
       >
-        <ScrollView ref={scrollViewRef} contentContainerStyle={styles.contentContainer} keyboardShouldPersistTaps="handled">
-          {isLoading && <ActivityIndicator size="large" color={theme.primaryColor} />}
+        <ScrollView
+          ref={scrollViewRef}
+          contentContainerStyle={styles.contentContainer}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+          {isLoading && (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="large" color={theme.primaryColor} />
+            </View>
+          )}
 
           <View style={styles.section}>
             <SelectList
@@ -256,34 +261,16 @@ const App = ({ navigation }) => {
           </View>
 
           <View style={styles.section}>
-            <SelectList
-              placeholder="Selecione o Beneficiário"
-              searchPlaceholder="Pesquise..."
-              setSelected={handleBeneficiarySelect}
-              data={beneficiaries}
-              save="value"
-              search={true}
-              boxStyles={[styles.dropdown, errors.beneficiary ? styles.dropdownError : {}]}
-              inputStyles={styles.dropdownText}
-              dropdownTextStyles={styles.dropdownText}
-              placeholderStyle={styles.dropdownPlaceholder}
-              disabled={isLoading || beneficiaries.length === 0}
+            <SelectBeneficiario
+              selectedItem={selectedItem}
+              setSelectedItem={setSelectedItem}
+              onSelect={(item) => handleBeneficiarySelect(item)}
+              isEmpty={errors.beneficiary}
               accessibilityLabel="Selecionar beneficiário"
-              accessibilityRole="combobox"
             />
             {errors.beneficiary && (
               <Text style={styles.errorMessage} accessibilityLabel={errors.beneficiary}>
                 {errors.beneficiary}
-              </Text>
-            )}
-            {beneficiaries.length === 0 && !isLoading && (
-              <Text style={styles.noDataText} accessibilityLabel="Nenhum beneficiário disponível">
-                Nenhum beneficiário disponível. Tente novamente ou entre em contato com o suporte.
-              </Text>
-            )}
-            {errors.api && (
-              <Text style={styles.errorMessage} accessibilityLabel={errors.api}>
-                {errors.api}
               </Text>
             )}
           </View>
@@ -299,6 +286,7 @@ const App = ({ navigation }) => {
             styles={styles}
             errors={errors}
             theme={theme}
+            accessibilityLabel="Digite o email"
           />
           <FormInput
             field="titular"
@@ -311,6 +299,7 @@ const App = ({ navigation }) => {
             styles={styles}
             errors={errors}
             theme={theme}
+            accessibilityLabel="Digite o nome do titular"
           />
           <FormInput
             field="carteirinha"
@@ -323,6 +312,20 @@ const App = ({ navigation }) => {
             styles={styles}
             errors={errors}
             theme={theme}
+            accessibilityLabel="Digite o número da carteirinha"
+          />
+          <FormInput
+            field="cpf"
+            label="CPF"
+            value={formData.cpf}
+            onChange={(text) => handleInputChange('cpf', text)}
+            icon="card-account-details"
+            max={14}
+            teclado="numeric"
+            styles={styles}
+            errors={errors}
+            theme={theme}
+            accessibilityLabel="Digite o CPF"
           />
           <FormInput
             field="message"
@@ -333,13 +336,20 @@ const App = ({ navigation }) => {
             max={500}
             teclado="default"
             multiline={true}
-            numberOfLines={3}
+            numberOfLines={5}
             onFocus={handleMessageClick}
             inputRef={messageInputRef}
             styles={styles}
             errors={errors}
             theme={theme}
+            accessibilityLabel="Digite o relato"
           />
+
+          {errors.api && (
+            <Text style={styles.errorMessage} accessibilityLabel={errors.api}>
+              {errors.api}
+            </Text>
+          )}
 
           <View style={styles.section}>
             <TouchableOpacity
