@@ -1,4 +1,3 @@
-// src/screens/Senha/index.js
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Alert, KeyboardAvoidingView, Platform, ActivityIndicator } from 'react-native';
 import { useTheme } from '../../context/ThemeContext';
@@ -21,12 +20,15 @@ const Senha = ({ navigation }) => {
       if (!validateLogin()) return;
 
       const normalizedLogin = login.trim(); // Trim whitespace
-      const response = await api.get(`Beneficiario/find/${encodeURIComponent(normalizedLogin)}`);
-      const rows = response.data?.rows;
+      const response = await api.post(`/Beneficiario/forgot-password`, [normalizedLogin] );
+      const rows = response.data;
+
+      console.log(rows)
 
       if (rows?.length > 0) {
         setUserData(rows[0]);
         setIsUserFound(true);
+         Alert.alert('Alterado com Sucesso', rows.mensagem );
       } else {
         Alert.alert('Usuário não encontrado', 'Verifique o E-mail ou CPF e tente novamente.', [{ text: 'OK' }]);
         setIsUserFound(false);
@@ -40,23 +42,6 @@ const Senha = ({ navigation }) => {
       setIsUserFound(false);
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const showPassword = () => {
-    if (userData) {
-      Alert.alert(
-        `Olá, ${userData.nm_beneficiario}!`,
-        `Sua senha: ${userData.cd_password} (Em teste, exibida na tela. Futuramente, será enviada por e-mail.)`,
-        [{ text: 'OK', onPress: () => navigation.navigate('Home') }],
-        { accessibilityLabel: 'Senha recuperada' }
-      );
-      setLogin('');
-      setUserData(null);
-      setIsUserFound(false);
-    } else {
-      Alert.alert('Usuário não encontrado', 'Verifique o E-mail ou CPF e tente novamente.', [{ text: 'OK' }]);
-      setIsUserFound(false);
     }
   };
 
@@ -84,8 +69,9 @@ const Senha = ({ navigation }) => {
   };
 
   return (
-    <View style={styles.content}>
-      <View style={styles.content}>
+    <View style={{flex: 1}}>
+    <View style={styles.Senhacontainer}>
+      <View style={styles.Senhacontainer}>
         <KeyboardAvoidingView
           style={styles.Senhacontainer}
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -94,7 +80,7 @@ const Senha = ({ navigation }) => {
           <View style={styles.content}>
             <TextInput
               style={styles.Senhainput}
-              placeholder="Insira seu E-mail ou CPF"
+              placeholder="Insira seu E-mail ou CPF "
               placeholderTextColor={theme.placeholderColor}
               value={login}
               onChangeText={setLogin}
@@ -105,15 +91,15 @@ const Senha = ({ navigation }) => {
             />
             <TouchableOpacity
               style={[styles.Senhabutton, isLoading && styles.buttonDisabled]}
-              onPress={isUserFound ? showPassword : handleRecover}
+              onPress={handleRecover}
               disabled={isLoading}
-              accessibilityLabel={isUserFound ? 'Mostrar senha' : 'Recuperar senha'}
+              accessibilityLabel={'Recuperar senha'}
             >
               {isLoading ? (
                 <ActivityIndicator size="small" color={theme.buttonTextColor} />
               ) : (
                 <Text style={styles.SenhabuttonText}>
-                  {isUserFound ? 'Mostrar Senha' : 'Recuperar Senha'}
+                  'Recuperar Senha'
                 </Text>
               )}
             </TouchableOpacity>
@@ -122,6 +108,7 @@ const Senha = ({ navigation }) => {
             </TouchableOpacity>
           </View>
         </KeyboardAvoidingView>
+      </View>
       </View>
       <Rodape />
     </View>

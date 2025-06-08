@@ -32,7 +32,8 @@ export const formatDate = (value) => {
   if (cleaned.length === 0) return '';
   return cleaned
     .replace(/(\d{2})(\d)/, '$1/$2')
-    .replace(/(\d{2})(\d)/, '$1/$2');
+    .replace(/(\d{2})(\d)/, '$1/$2')
+    .replace(/(\d{4})$/, '$1');
 };
 
 // Função para validar e formatar datas (DD/MM/YYYY -> YYYY-MM-DD)

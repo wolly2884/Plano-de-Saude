@@ -202,7 +202,7 @@ export default function App({ route, navigation }) {
         <Text style={styles.headerText}>Olá, {ben.value}, </Text>
         <Text style={styles.headerText}>Tudo bem!</Text>
         <View style={styles.headerTextContainer}>
-          <Text style={styles.headerText}>Eu sou {med.sexo === 'M' ?'a ' : 'o ' } {med.Nome}</Text>
+          <Text style={styles.headerText}>Eu sou {med.sexo === 'M' ?' a' : ' o ' } {med.Nome}</Text>
           <Text style={styles.headerText}>{esp.value}</Text>
           <Text style={styles.headerText}>CRM: {med.crm}</Text>
         </View>

@@ -4,14 +4,16 @@ import { StatusBar } from 'expo-status-bar';
 import moment from 'moment';
 import Calendar from '../../../../../components/Calendar';
 import Rodape from '../../../../../components/Rodape';
-import { Postage } from '../../../../../api/api_post_Agenda';
 import api from '../../../../../api/api';
 import Modal from "react-native-modal";
-import { styles } from './Styles';
+import { getStyles } from './Styles';
+import { useTheme } from '../../../../../context/ThemeContext';
 import { FontAwesome } from '@expo/vector-icons';
 import { Camera, Send } from 'lucide-react-native';
 
 const Horarios = ({ selected, onSelect, hora }) => {
+    const { theme } = useTheme();
+    const styles = getStyles(theme);
   const handlePress = () => {
     onSelect();
   };
@@ -37,7 +39,8 @@ export default function App({ route, navigation }) {
   const [color, setColor] = useState('white');
   const [disabled, setDisabled] = useState(true);
   const [isSending, setIsSending] = useState(false);
-
+  const { theme } = useTheme();
+  const styles = getStyles(theme);
   const handleHorarioSelect = (horario) => {
     const index = selectedHorarios.indexOf(horario);
     const updatedHorarios = [...selectedHorarios];
@@ -125,26 +128,28 @@ export default function App({ route, navigation }) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={{ borderWidth: 0, width: "100%", height: '40%' }}>
-        <Image source={require('../../../../../assets/src/Receita.png')} style={{ width: '90%', height: '70%', position: 'absolute', bottom: 0, right: 10 }} />
-        <Text style={{ fontSize: 20, fontStyle: 'italic', fontWeight: 'bold', top: 20 }}> Olá, {ben.Nome}, Tudo bem!</Text>
-        <Text style={{ fontSize: 15, fontStyle: 'italic', fontWeight: 'bold', top: 20, left: 20 }}>{ate.Nome}: {med.value}</Text>
-        <Text style={{ fontSize: 10, fontStyle: 'italic', fontWeight: 'bold', top: 30, left: 10 }}>Dúvidas sobre o Uso:</Text>
-        <View style={{ flexDirection: 'row' }}>
-          <TouchableOpacity style={{ width: '10%', height: '10%' }} onPress={() => callPhoneNumber('+5513981375296')}>
-            <Image source={require('../../../../../assets/src/telef.png')} style={{ width: 30, height: 30, top: 35, left: 10 }} />
+          <View style={styles.headerContainer}>
+        <Image source={require('../../../../../assets/src/Receita.png')} style={styles.headerImage} />
+        <Text style={styles.headerText}>Olá, {ben.value}, </Text>
+        <Text style={styles.headerText}>Tudo bem!</Text>
+        <View style={styles.headerTextContainer}>
+          <Text style={styles.headerText}>{med.value} </Text>
+          <Text style={styles.headerText}>Dúvidas sobre o Uso:</Text>
+        </View> 
+        <View style={styles.buttonHeader}>
+          <TouchableOpacity style={styles.buttonContainer}  onPress={() => callPhoneNumber('+5513981375296')}>
+            <FontAwesome name="phone" size={30} color={theme.inputTextColor} style={styles.contato} />
           </TouchableOpacity>
-          <TouchableOpacity style={{ width: '10%', height: '10%' }} onPress={openWhatsApp}>
-            <Image source={require('../../../../../assets/src/whatsapp.png')} style={{ width: 30, height: 30, top: 35, left: 20 }} />
+          <TouchableOpacity style={styles.buttonContainer}  onPress={openWhatsApp}>
+            <FontAwesome name="whatsapp" size={30} color={theme.inputTextColor} style={styles.contato} />
           </TouchableOpacity>
-          <TouchableOpacity style={{ width: '10%', height: '10%' }} onPress={sendEmail}>
-            <Image source={require('../../../../../assets/bula.png')} style={{ width: 30, height: 30, top: 35, left: 30 }} />
+          <TouchableOpacity style={styles.buttonContainer}  onPress={sendEmail}>
+            <FontAwesome name="stethoscope" size={30} color={theme.inputTextColor} style={styles.contato} />
           </TouchableOpacity>
         </View>
       </View>
       <View style={{ borderWidth: 0, width: "100%", height: '60%', borderTopLeftRadius: 30, borderTopRightRadius: 30, backgroundColor: 'white' }}>
         <View style={{ top: -33 }}>
-          <Text style={{ fontSize: 30, fontWeight: 'bold', fontStyle: 'italic', top: 30, left: 40 }}>Agenda</Text>
           <View>
             <Calendar onSelectDate={(item) => SelDate(item)} selected={selectedDate} />
             <StatusBar style="auto" />

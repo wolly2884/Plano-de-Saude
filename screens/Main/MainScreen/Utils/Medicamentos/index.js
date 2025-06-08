@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import { View, Text, Image, TouchableOpacity, ScrollView } from 'react-native';
-import { styles } from './Styles';
+import SelectLista from '../../../../../components/SelectList';
+import SelectBeneficiario from '../../../../../components/SelectBeneficiario';
 import api from '../../../../../api/api';
-
-import { SelectList } from 'react-native-dropdown-select-list';
+import { AntDesign } from '@expo/vector-icons';
 
 import Rodape  from '../../../../../components/Rodape';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
+import { getStyles } from './Styles';
+import { useTheme } from '../../../../../context/ThemeContext';
 
 const Agenda = ({ navigation }) => {
   const [Medico         , SetMedico]        = useState([]);
@@ -30,6 +32,8 @@ const Agenda = ({ navigation }) => {
   const [isEmptyEspecialidade   , setIsEmptyEspecialidade]  = useState(true);
   const [isEmptyDropDownPicker  , setIsEmptyDropDownPicker] = useState(true);
   const [isEmptyAtendimento     , setIsEmptyAtendimento]    = useState(true);
+  const { theme } = useTheme();
+  const styles = getStyles(theme);
 
     useFocusEffect(
         React.useCallback(() => {
@@ -239,79 +243,62 @@ const Agenda = ({ navigation }) => {
     };
 
     return (
-        <View style={{flex: 1, backgroundColor: 'white', alignItems: 'center', justifyContent: 'center' }}>
-            <Text style={{ position: 'absolute',  fontSize: 28, color: 'black', top: 0 }}> Bem Vindo ao Receituario </Text>
-            <Image source={require('../../../../../assets/src/medicamento.png')} style={{width: 240, height: 300, position: 'absolute', top: 40}}/>
+        <View style={styles.container}>
+            <Text style={styles.header}> Bem Vindo ao Receituario </Text>
+            <Image source={require('../../../../../assets/src/medicamento.png')} style={styles.Image} />
 
-            <ScrollView style={{ top: 110, height: 480}}>
-
-                <View style={{ marginTop: 220, width: '100%' }}>
-                    <SelectList
-                        placeholder='Selecione o Beneficiario'
-                        setSelected={setSelectedItem}
-                        data={Beneficiario}
-                        search={true} // Você pode ativar a busca se quiser
-                        boxStyles={[styles.View2, { borderWidth: 1, top: 10, zIndex: 2 }]}
-                        dropdownStyles={{ borderWidth: 1,  width: '97%', top: 5  }}
-                        onSelect={() => {SelBenef(selectedItem) }}/>
-                    {isEmptyDropDownPicker && isEmptyerror && <Text style={[styles.errorMessage, { top: 7, left: 0 }]}>Selecione o Beneficiario</Text>}
+            <ScrollView style={styles.scrollView}>
+                <View style={styles.beneficiario}>
+                    <SelectBeneficiario
+                        selectedItem={selectedItem}
+                        setSelectedItem={setSelectedItem}
+                        onSelect={SelBenef}
+                        isEmpty={isEmptyDropDownPicker && isEmptyerror}
+                    />
                 </View>
 
-                <View style={{ marginTop: 10, width: '100%' }}>
-                    <SelectList
-                    placeholder='Selecione o Medicamento'
-                    setSelected={setSelMedItem}
+            <View style={styles.SelectList}>
+                <SelectLista
                     data={Medico}
-                    search={true}
-                    boxStyles={[styles.View2, { borderWidth: 1, top: 10, zIndex: 1 }]}
-                    dropdownStyles={{ borderWidth: 1,  width: '97%', top: 5 }}
-                    onSelect={() => SelMed(selMedItem)}
-                    />
-                    {isEmptyNMedica && isEmptyerror && <Text style={[styles.errorMessage, { top: 7, left: 0 }]}>Selecione o Medicamento</Text>}
-                </View>
+                    selectedItem={selMedItem}
+                    setSelected={setSelMedItem}
+                    onSelect={SelMed}
+                    isEmpty={isEmptyNMedica && isEmptyerror}
+                    placeholder='Médico'
+                />
 
-
-                <View style={{ marginTop: 10, width: '100%' }}>
-                    <SelectList
-                    placeholder='Selecione a Especialidade'
-                    setSelected={setSelEspItem}
+                <SelectLista
                     data={Especialidade}
-                    search={true}
-                    boxStyles={[styles.View2, { borderWidth: 1, top: 10, zIndex: 1 }]}
-                    dropdownStyles={{ borderWidth: 1,  width: '97%', top: 5 }}
-                    onSelect={() => SelEsp( selEspItem)}
-                    />
-                    {isEmptyEspecialidade && isEmptyerror && <Text style={[styles.errorMessage, { top: 7, left: 0 }]}>Selecione a Especialidade</Text>}
-                </View>
+                    selectedItem={selEspItem}
+                    setSelected={setSelEspItem}
+                    onSelect={SelEsp}
+                    isEmpty={isEmptyEspecialidade && isEmptyerror}
+                    placeholder='Especialidade'
+                />
 
-                <View style={{ marginTop: 10, width: '100%' }}>
-                    <SelectList
-                    placeholder='Selecione o tipo de Atendimento'
-                    setSelected={setSelAteItem} 
+                <SelectLista
                     data={Atendimento}
-                    search={true}
-                    boxStyles={[styles.View2, { borderWidth: 1, top: 10, zIndex: 1 ,  width: '97%'}]}
-                    dropdownStyles={{ borderWidth: 1,  width: '97%', top: 5, height: '40%' }}
-                    onSelect={() => Selate(selAteItem)}
-                    />
-                    {isEmptyAtendimento && isEmptyerror && <Text style={[styles.errorMessage, { top: 7, left: 0 }]}>Selecione o Atendimento</Text>}
-                </View>
-                <View style={{ marginTop: 10, width: '100%' }}>
+                    selectedItem={selAteItem}
+                    setSelected={setSelAteItem}
+                    onSelect={Selate}
+                    isEmpty={isEmptyAtendimento && isEmptyerror}
+                    placeholder='Tipo de Atendimento'
+                />
                 </View>
             </ScrollView>
 
-        <View style={{width: '30%', borderWidth: 1, height: 40, position: 'absolute', bottom: 50, right: 10, marginEnd: 0, borderRadius: 30 }}>
-            <TouchableOpacity onPress={() => Valida() }>
-                <View style={{ borderWidth: 0, height: 40 }}>
-                    <Text style={{ textAlign: 'center', textAlignVertical: 'center', fontSize: 25 }}>Avançar</Text>
-                </View>
+        <View style={styles.buttonavancar}>
+            <TouchableOpacity onPress={Valida} style={styles.button}>
+                <Text style={styles.buttonText}>Avançar</Text>
+                <AntDesign name="right" size={24} color="white" />           
+                <AntDesign name="right" size={24} color="white" />           
             </TouchableOpacity>
         </View>
 
-    <View style={{width: '105%', position: 'absolute', bottom: 0, right: 0, marginEnd: 0, borderRadius: 30 }}>
-        <Rodape />
+        <View style={{ width: '100%', position: 'absolute', bottom: 0 }}>
+            <Rodape />
+        </View>
     </View>
-</View>
     );
 };
 

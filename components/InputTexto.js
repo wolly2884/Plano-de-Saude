@@ -36,10 +36,11 @@ const InputTexto = ({
         label={text}
         textColor={theme.textColor}
         underlineColor="transparent"
-        activeOutlineColor="white"
+        activeOutlineColor={theme.textColor}
+        activeUnderlineColor={theme.textColor}
         multiline={multiline}
         numberOfLines={multiline ? numberOfLines : 1}
-        outlineColor="#666"
+        outlineColor={theme.textColor}
         style={[{ backgroundColor: 'black' }, style]}
         theme={{
           colors: {
@@ -50,12 +51,12 @@ const InputTexto = ({
         }}
         left={
           <TextInput.Icon
-            name={() => (
+            icon={() => (
               <TouchableOpacity onPress={onlong}>
                 <MaterialCommunityIcons
                   name={icon}
                   size={24}
-                  color={redicon ? 'red' : 'gray'}
+                  color={redicon ? 'red' : theme.textColor}
                 />
               </TouchableOpacity>
             )}

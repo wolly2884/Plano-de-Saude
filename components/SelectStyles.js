@@ -17,6 +17,7 @@ export const getStyles = (theme) => StyleSheet.create({
     backgroundColor: theme.inputBackgroundColor || '#fff',
     color: theme.textColor || '#000',
     fontSize: 16,
+    width: '100%'
   },
 
   Cadbutton: {
@@ -34,12 +35,11 @@ export const getStyles = (theme) => StyleSheet.create({
     fontWeight: 'bold',
   },
 
-    errorMessage: {
+  errorMessage: {
       color: 'red',
       fontSize: 14,
-      marginTop: -13,
+      marginTop: -10,
     },
-    
     dropdown: {
       backgroundColor: theme.backgroundColor,
       borderColor: theme.textColor,
@@ -95,35 +95,4 @@ export const getStyles = (theme) => StyleSheet.create({
       marginBottom: 1,
 
     },
- 
-  dropdownError: {
-    borderColor: theme.errorMessagem,
-  },
-  lenerror: {
-    color: theme.errorMessagem,
-    fontSize: 12,
-    marginTop: 5,
-  },
-  Senhabutton: {
-    backgroundColor: theme.buttonBackground,
-    padding: 15,
-    borderRadius: 5,
-    alignItems: 'center',
-    marginVertical: 10,
-  },
-  SenhabuttonDisabled: {
-    opacity: 0.6,
-  },
-  SenhabuttonText: {
-    color: theme.buttonTextColor,
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  SenharegisterLink: {
-    color: theme.linkColor,
-    fontSize: 14,
-    textAlign: 'center',
-    marginTop: 10,
-  },
-
 });

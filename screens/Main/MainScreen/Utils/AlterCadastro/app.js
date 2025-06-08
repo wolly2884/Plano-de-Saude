@@ -78,6 +78,7 @@ const App = ({ navigation }) => {
     healthPlan: '',
     CNS: '',
     dtInclusao: '',
+    id: '',
   });
 
   // Estado consolidado para validação
@@ -167,7 +168,7 @@ const App = ({ navigation }) => {
     }
 
     const payload = {
-      id: parseInt(ID),
+      id: formData.id,
       nm_beneficiario: formData.nmBeneficiario,
       cd_cpf: formData.CPF.replace(/\D/g, ''),
       cd_password: formData.password,
@@ -188,8 +189,10 @@ const App = ({ navigation }) => {
       dt_inclusao: formattedDtInclusao,
     };
 
+    console.log(payload);
+
     try {
-      await api.post('/Beneficiario', [payload]);
+      await api.put('/Beneficiario', [payload]);
       Alert.alert('Sucesso', 'Cadastro atualizado com sucesso!', [
         { text: 'OK', onPress: () => navigation.goBack() },
       ]);
@@ -227,7 +230,9 @@ const App = ({ navigation }) => {
         healthPlan: beneficiary.ds_healthplan || '',
         CNS: beneficiary.cd_cns || '',
         dtInclusao: formatDate(beneficiary.dt_inclusao) || '',
+        id: beneficiary.key,
       });
+      console.log(formData)
       setFormErrors({}); // Clear errors on selection
     }
   };
@@ -288,7 +293,7 @@ const App = ({ navigation }) => {
             <InputTexto
               text="Data de Nascimento (DD/MM/YYYY)"
               value={formData.age}
-              funcao={(value) => updateFormData('age', value)}
+              funcao={(value) => updateFormData('age', value, 10)}
               max={10}
               teclado="numeric"
               icon={formErrors.age ? 'calendar-alert' : 'calendar'}
