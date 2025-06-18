@@ -65,8 +65,8 @@ export const getStyles = (theme) =>
     width: hp('10%'),
     height: hp('10%'),
     position: 'absolute',
-    bottom: hp('12%'), 
-    right: wp('2%'),
+    bottom: hp('14%'), 
+    right: wp('3%'),
     transform: [{ rotate: '90deg' }],
   },
   containerCard: {

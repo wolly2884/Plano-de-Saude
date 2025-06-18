@@ -1,11 +1,14 @@
 // src/screens/MainScreen/index.js
 import React, { useEffect } from 'react';
-import { View, Text, Switch } from 'react-native';
+import { View, Text, Switch, Image } from 'react-native';
 import * as ScreenOrientation from 'expo-screen-orientation';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import { getStyles } from './Styles';
 import Rodape from '../../../components/Rodape';
 import LogoSVG from '../../../components/LogoSVG';
+import PlanFacil   from '../../../components/PlanoFacil';
+import Logointro from '../../../components/logointro';
+
 import Login from '../../LoginScreen/index';
 import Planos from '../ScreenTabs/PlanosTabs/index';
 import Noticias from '../ScreenTabs/NoticiasTabs/index';
@@ -31,7 +34,9 @@ const App = ({ navigation }) => {
         <View style={styles.homenavBar}>
           <View style={styles.navRow}>
             <View style={{ alignItems: 'center', marginTop: 70 }}>
-              <LogoSVG width={150} height={50} />
+              <View style={{left: 30, height: 60, top: 5, alignContent: 'center', justifyContent: 'center'}}>
+                <Logointro />
+              </View>
               <Text style={styles.welcomeText}>
                 Bem vindo ao Login do Portal do Beneficiário
               </Text>

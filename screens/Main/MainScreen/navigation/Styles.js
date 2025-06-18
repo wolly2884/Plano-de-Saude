@@ -85,7 +85,7 @@ export const getStyles = (theme) =>
     bottom: -20,
     right:0,
     position: 'absolute',
-    backgroundColor: 'black' //theme.cardbackground,
+    backgroundColor: theme.cardbackground,
   },
  footer: {
     position: 'absolute',

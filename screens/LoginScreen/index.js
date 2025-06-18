@@ -88,8 +88,10 @@ const LoginScreen = ({ navigation }) => {
 
   const validateLogin = async () => {
     if (validCPF() || validEmail()) {
+      const sanitizedLogin = cpf.isValid(login) ? login.replace(/\D/g, '') : login.toLowerCase();
+    
       try {
-        const response = await api.get(`Beneficiario/find/${login}`);
+        const response = await api.get(`Beneficiario/find/${sanitizedLogin}`);
         const { rowCount, rows } = response.data;
 
         if (rowCount > 0) {
@@ -99,6 +101,7 @@ const LoginScreen = ({ navigation }) => {
           setStoredPassword(user.cd_password);
 
           await storeUserData(user);
+          await AsyncStorage.setItem('beneficiaries', JSON.stringify([]));
           await AsyncStorage.setItem('beneficiaries', JSON.stringify(formatBeneficiaries(rows)));
 
           return true;
@@ -123,8 +126,7 @@ const LoginScreen = ({ navigation }) => {
 
       if (
         (login === storedCPF && password === storedPassword) ||
-        (login === storedEmail && password === storedPassword) ||
-        Platform.OS === 'web'
+        (login === storedEmail && password === storedPassword) 
       ) {
         if (biometricFlag !== null && biometricFlag === 'false') {
           setIsModalVisible(true);

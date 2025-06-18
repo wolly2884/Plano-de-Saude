@@ -19,7 +19,7 @@ const Menu = ({ navigation }) => {
       </View>
 
       <View style={styles.rowContainer2}>
-        <Botao text={'Inclusão de Dependente'}  nav={'Inclusão de Dependente'} image={require('../../../../assets/src/Dependente.jpg')} />
+        <Botao text={'Inclusão Dependente'}     nav={'Inclusão de Dependente'} image={require('../../../../assets/src/Dependente.jpg')} />
         <Botao text={'Configuração'}            nav={'Configurações'}           image={require('../../../../assets/src/config.png')} />
       </View>
     </View>

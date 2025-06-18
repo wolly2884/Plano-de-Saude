@@ -23,7 +23,6 @@ const TabBarIcon = ({ focused, name, color }) => {
   } else if (name === 'Settings') {
     iconName = focused ? 'settings' : 'settings-outline';
   }
-
   return <Icon name={iconName} size={24} color={color} />;
 };
 

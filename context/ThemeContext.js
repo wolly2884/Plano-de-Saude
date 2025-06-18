@@ -50,6 +50,7 @@ export const ThemeProvider = ({ children }) => {
         tabBarActiveTextColor: '#4FC3F7',
         tabBarIndicatorColor: '#4FC3F7',    
         errorMessagem: '#000000',
+        shadowColor: '#FFFFFF',
       }
     : {
         backgroundColor: '#FFFFFF',
@@ -70,6 +71,7 @@ export const ThemeProvider = ({ children }) => {
         tabBarActiveTextColor: '#00BFFF',
         tabBarIndicatorColor: '#00BFFF',
         errorMessagem: 'red',
+        shadowColor: '#000000',
       };
 
   return (

@@ -13,6 +13,7 @@ import { useTheme } from '../../../../../context/ThemeContext';
 
 const Agenda = ({ navigation }) => {
   const [Medico         , SetMedico]        = useState([]);
+  const [Medico_old     , SetMedico_old]        = useState([]);
   const [Beneficiario   , SetBeneficiario]  = useState([]);
   const [Especialidade  , SetEspecialidade] = useState([]);
   const [Atendimento    , SetAtendimento]   = useState([]);
@@ -32,6 +33,7 @@ const Agenda = ({ navigation }) => {
   const [isEmptyEspecialidade   , setIsEmptyEspecialidade]  = useState(true);
   const [isEmptyDropDownPicker  , setIsEmptyDropDownPicker] = useState(true);
   const [isEmptyAtendimento     , setIsEmptyAtendimento]    = useState(true);
+
   const { theme } = useTheme();
   const styles = getStyles(theme);
 
@@ -134,33 +136,16 @@ const Agenda = ({ navigation }) => {
                     }
                     return newData;
                 });
-            } else {
-                // Handle user not found
-            }
-        } catch (error) {
-            console.error('Error fetching medico:', error);
-            // Handle error
-        }
-    };
-
-    const atendimento = async () => {
-        try {
-            const userData = await api.get('/Atendimento');  
-            const rowCount = userData.data.rowCount;
-            
-            if (rowCount > 0) {
-                // Montando os dados com forEach
-                SetAtendimento(prevState => {
+                SetMedico_old(prevState => {
                     const newData = [];
-                    
+
                     for (var i = 0; i < rowCount; i++) {
-                        if ('Medicamentos' !==     userData.data.rows[i].ds_atendimento && 'Materias' !== userData.data.rows[i].ds_atendimento ){
-                            newData.push({  label: userData.data.rows[i].id,
-                                            value: userData.data.rows[i].ds_atendimento, 
-                                            Nome:  userData.data.rows[i].ds_atendimento,
-                                            id:    userData.data.rows[i].id,
-                                });
-                        }
+                      newData.push({label: userData.data.rows[i].id,
+                                    Nome:  userData.data.rows[i].tp_matmedtax,
+                                    crm:   userData.data.rows[i].cd_medicamento,
+                                    value: userData.data.rows[i].ds_medicamento,
+
+                                    });
                     }
                     return newData;
                 });
@@ -172,15 +157,25 @@ const Agenda = ({ navigation }) => {
             // Handle error
         }
     };
+
+    const atendimento =  () => {
+       
+        // Montando os dados com forEach
+        SetAtendimento(prevState => {
+            const newData = ['Medicamentos', 'Materiais', 'Taxas e Gases'];
+            return newData;
+        });
+
+    };
     const Valida=()=>{
         if (isEmptyNMedica || isEmptyEspecialidade || isEmptyDropDownPicker){
             setisEmptyerror(true);
         } else {
             setisEmptyerror(false);
             navigation.navigate('Receita', { ben: selbenef, 
-                                            med: selmedic, 
-                                            esp: selespec,
-                                            ate: selatend
+                                             med: selmedic, 
+                                             esp: selespec,
+                                             ate: selatend
                                         });
         }
 
@@ -190,10 +185,9 @@ const Agenda = ({ navigation }) => {
         setIsEmptyDropDownPicker(false);
     
         // Encontra o objeto completo no array Beneficiario com base no valor selecionado
-        const selectedItem = Beneficiario.find(benef => benef.value === selectedValue);
+        const selectedItem = Beneficiario.find(benef => benef.value === selectedValue.value);
     
         if (selectedItem) {
-            console.log('Item encontrado:', selectedItem); // Aqui você terá o objeto completo
             setbenef(selectedItem); // Atualiza o estado com o objeto selecionado
         } else {
             console.log('Item não encontrado para o valor:', selectedValue);
@@ -207,7 +201,6 @@ const Agenda = ({ navigation }) => {
         const selespecItem = Especialidade.find(espec => espec.value === selectedValue);
     
         if (selespecItem) {
-            console.log('Item encontrado:', selespecItem); // Aqui você terá o objeto completo
             setespec(selespecItem); // Atualiza o estado com o objeto selecionado
         } else {
             console.log('Item não encontrado para o valor:', selectedValue);
@@ -221,7 +214,6 @@ const Agenda = ({ navigation }) => {
         const selmedcItem = Medico.find(medic => medic.value === selectedValue);
     
         if (selmedcItem) {
-            console.log('Item encontrado:', selmedcItem); // Aqui você terá o objeto completo
             setmedic(selmedcItem); // Atualiza o estado com o objeto selecionado
         } else {
             console.log('Item não encontrado para o valor:', selmedcItem);
@@ -230,18 +222,30 @@ const Agenda = ({ navigation }) => {
 
     const Selate = (selectedValue) => {
         setIsEmptyAtendimento(false);
-    
-        // Encontra o objeto completo no array Beneficiario com base no valor selecionado
-        const selateItem = Atendimento.find(ate => ate.value === selectedValue);
-    
-        if (selateItem) {
-            console.log('Item encontrado:', selateItem); // Aqui você terá o objeto completo
-            setatend(selateItem); // Atualiza o estado com o objeto selecionado
+
+        // Find the selected atendimento item
+        const selectedAtendimento = Atendimento.find(ate => ate.value === selectedValue.value);
+
+        if (selectedAtendimento) {
+            setatend(selectedAtendimento); // Update selected atendimento
         } else {
-            console.log('Item não encontrado para o valor:', selateItem);
+            console.log('Atendimento item not found for value:', selectedValue.value);
+            return;
+        }
+
+        // Restaura lista original de médicos antes de filtrar
+        SetMedico(Medico_old);
+
+        const newMedico = Medico_old.filter(med => med.Nome === selectedValue);
+        
+        if (newMedico.length > 0) {
+            SetMedico(newMedico);
+        } else {
+            console.log('Nenhum medicamento encontrado para o tipo:', selectedValue);
         }
     };
-
+            
+      
     return (
         <View style={styles.container}>
             <Text style={styles.header}> Bem Vindo ao Receituario </Text>
@@ -259,14 +263,13 @@ const Agenda = ({ navigation }) => {
 
             <View style={styles.SelectList}>
                 <SelectLista
-                    data={Medico}
-                    selectedItem={selMedItem}
-                    setSelected={setSelMedItem}
-                    onSelect={SelMed}
-                    isEmpty={isEmptyNMedica && isEmptyerror}
-                    placeholder='Médico'
+                    data={Atendimento}
+                    selectedItem={selAteItem}
+                    setSelected={setSelAteItem}
+                    onSelect={Selate}
+                    isEmpty={isEmptyAtendimento && isEmptyerror}
+                    placeholder='Tipo de Atendimento'
                 />
-
                 <SelectLista
                     data={Especialidade}
                     selectedItem={selEspItem}
@@ -275,14 +278,13 @@ const Agenda = ({ navigation }) => {
                     isEmpty={isEmptyEspecialidade && isEmptyerror}
                     placeholder='Especialidade'
                 />
-
                 <SelectLista
-                    data={Atendimento}
-                    selectedItem={selAteItem}
-                    setSelected={setSelAteItem}
-                    onSelect={Selate}
-                    isEmpty={isEmptyAtendimento && isEmptyerror}
-                    placeholder='Tipo de Atendimento'
+                    data={Medico}
+                    selectedItem={selMedItem}
+                    setSelected={setSelMedItem}
+                    onSelect={SelMed}
+                    isEmpty={isEmptyNMedica && isEmptyerror}
+                    placeholder='Materiais ou Medicamentos'
                 />
                 </View>
             </ScrollView>

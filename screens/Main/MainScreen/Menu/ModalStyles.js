@@ -17,6 +17,7 @@ export const getTabStyle = () => {
     inicontainer: {
       flex: 1,
       backgroundColor: theme.backgroundColor,
+      
     },
     tabBarActiveTintColor: theme === 'dark' ? '#fff' : '#000',
     tabBarActiveBackgroundColor: theme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
@@ -70,26 +71,31 @@ export const getStyles = (theme) =>
     textAlign: 'center',
     fontSize: 11
   },
-    container: {
+
+  container: {
     flex: 1,
     justifyContent: 'space-between',
     borderWidth: 1,
-    backgroundColor: theme.menubackground, //'white'
+    backgroundColor: theme.menubackground, //'white',
   },
+
   rowContainerchat: {
     flexDirection: 'row',
     justifyContent: 'space-around',
   },
-    rowContainer: {
+
+  rowContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     bottom: hp('2%'), // Use hp for responsive height
   },
-   rowContainer2: {
+  
+  rowContainer2: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     bottom: hp('6%'), // Use hp for responsive height
   },
+
   button: {
     borderWidth: 2,
     height: 100,
@@ -98,9 +104,11 @@ export const getStyles = (theme) =>
     borderColor: "white",
     backgroundColor: '#ceeaf2'
   },
+
   content: {
     padding: 20,
   },
+
   section_text: {
     fontSize: 20,
     alignSelf: 'center',
@@ -109,6 +117,8 @@ export const getStyles = (theme) =>
   },
   inicontainer: {
     flex: 1, 
+    backgroundColor: 'white',
+    
   },
   textPrice: {
     fontSize: 16,
