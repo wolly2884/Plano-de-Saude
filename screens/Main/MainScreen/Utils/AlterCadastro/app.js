@@ -89,12 +89,9 @@ const App = ({ navigation }) => {
   const sections = {
     beneficiario: [
       'nmBeneficiario',
-      'CPF',
-      'password',
       'age',
       'estadoCivil',
       'sexo',
-      'Email',
       'celular',
     ],
     endereco: [
@@ -104,13 +101,7 @@ const App = ({ navigation }) => {
       'cidade',
       'CEP',
       'estado',
-    ],
-    plano: [
-      'cardNumber',
-      'healthPlan',
-      'CNS',
-      'dtInclusao',
-    ],
+    ]
   };
 
   // Função para contar erros por seção
@@ -171,11 +162,9 @@ const App = ({ navigation }) => {
       id: formData.id,
       nm_beneficiario: formData.nmBeneficiario,
       cd_cpf: formData.CPF.replace(/\D/g, ''),
-      cd_password: formData.password,
       cd_age: formattedAge,
       ic_estado_civil: formData.estadoCivil,
       ic_sexo: formData.sexo,
-      ds_email: formData.Email,
       cd_celular: formData.celular.replace(/\D/g, ''),
       nm_logradouro: formData.logradouro,
       cd_numero: formData.numero,
@@ -183,10 +172,7 @@ const App = ({ navigation }) => {
       nm_cidade: formData.cidade,
       cd_cep: formData.CEP.replace(/\D/g, ''),
       sg_estado: formData.estado,
-      cd_cardnumber: formData.cardNumber,
-      ds_healthplan: formData.healthPlan,
       cd_cns: formData.CNS,
-      dt_inclusao: formattedDtInclusao,
     };
 
     console.log(payload);
@@ -214,11 +200,9 @@ const App = ({ navigation }) => {
       setFormData({
         nmBeneficiario: beneficiary.nm_beneficiario || '',
         CPF: formatCPF(beneficiary.cd_cpf) || '',
-        password: beneficiary.cd_password || '',
         age: formatDate(beneficiary.cd_age) || '',
         estadoCivil: beneficiary.ic_estado_civil || '',
         sexo: beneficiary.ic_sexo || '',
-        Email: beneficiary.ds_email || '',
         celular: formatCelular(beneficiary.cd_celular) || '',
         logradouro: beneficiary.nm_logradouro || '',
         numero: beneficiary.cd_numero || '',
@@ -226,10 +210,7 @@ const App = ({ navigation }) => {
         cidade: beneficiary.nm_cidade || '',
         CEP: formatCEP(beneficiary.cd_cep) || '',
         estado: beneficiary.sg_estado || '',
-        cardNumber: beneficiary.cd_cardnumber || '',
-        healthPlan: beneficiary.ds_healthplan || '',
         CNS: beneficiary.cd_cns || '',
-        dtInclusao: formatDate(beneficiary.dt_inclusao) || '',
         id: beneficiary.key,
       });
       console.log(formData)
@@ -254,7 +235,7 @@ const App = ({ navigation }) => {
 
           {/* Seção de Dados do Beneficiário */}
           <CollapsibleSection
-            title={countErrors('beneficiario') > 0 ? `Beneficiário (${countErrors('beneficiario')} erros)` : 'Beneficiário'}
+            title={countErrors('beneficiario') > 0 ? `Dados do Beneficiário (${countErrors('beneficiario')} erros)` : 'Dados do Beneficiário'}
             isOpen={openSection === 'beneficiario'}
             onToggle={() => setOpenSection(openSection === 'beneficiario' ? '' : 'beneficiario')}
             theme={theme}
@@ -268,34 +249,14 @@ const App = ({ navigation }) => {
               icon={formErrors.nmBeneficiario ? 'account-alert' : 'account'}
               style={getInputStyle('nmBeneficiario')}
             />
-            <InputTexto
-              text="CPF"
-              value={formData.CPF}
-              funcao={(value) => updateFormData('CPF', value)}
-              max={14}
-              teclado="numeric"
-              icon={formErrors.CPF ? 'badge-account-alert' : 'badge-account'}
-              style={getInputStyle('CPF')}
-            />
-            <InputTexto
-              text="Senha"
-              value={formData.password}
-              funcao={(value) => updateFormData('password', value)}
-              max={20}
-              istrue={showSenhaNew}
-              teclado="default"
-              onlong={toggleShowSenhaNew}
-              icon={showSenhaNew ? 'eye-off' : 'eye'}
-              redicon={formErrors.password}
-              style={getInputStyle('password')}
-              placeholderTextColor={theme.placeholderColor}
-            />
+
             <InputTexto
               text="Data de Nascimento (DD/MM/YYYY)"
               value={formData.age}
               funcao={(value) => updateFormData('age', value, 10)}
               max={10}
               teclado="numeric"
+              isDatePicker={true}
               icon={formErrors.age ? 'calendar-alert' : 'calendar'}
               style={getInputStyle('age')}
               redicon={formErrors.age}
@@ -320,16 +281,7 @@ const App = ({ navigation }) => {
               style={getInputStyle('sexo')}
               redicon={formErrors.sexo}
             />
-            <InputTexto
-              text="E-mail"
-              value={formData.Email}
-              funcao={(value) => updateFormData('Email', value)}
-              max={50}
-              teclado="email-address"
-              icon={formErrors.Email ? 'email-off' : 'email'}
-              style={getInputStyle('Email')}
-              redicon={formErrors.Email}
-            />
+
             <InputTexto
               text="Celular"
               value={formData.celular}
@@ -344,7 +296,7 @@ const App = ({ navigation }) => {
 
           {/* Seção de Dados do Endereço */}
           <CollapsibleSection
-            title={countErrors('endereco') > 0 ? `Endereço (${countErrors('endereco')} erros)` : 'Endereço'}
+            title={countErrors('endereco') > 0 ? `Endereço Beneficiario (${countErrors('endereco')} erros)` : 'Endereço Beneficiario'}
             isOpen={openSection === 'endereco'}
             onToggle={() => setOpenSection(openSection === 'endereco' ? '' : 'endereco')}
             theme={theme}
@@ -408,55 +360,6 @@ const App = ({ navigation }) => {
               icon={formErrors.estado ? 'map-marker-alert' : 'map'}
               style={getInputStyle('estado')}
               redicon={formErrors.estado}
-            />
-          </CollapsibleSection>
-
-          {/* Seção de Dados do Plano */}
-          <CollapsibleSection
-            title={countErrors('plano') > 0 ? `Plano (${countErrors('plano')} erros)` : 'Plano'}
-            isOpen={openSection === 'plano'}
-            onToggle={() => setOpenSection(openSection === 'plano' ? '' : 'plano')}
-            theme={theme}
-          >
-            <InputTexto
-              text="Número da Carteirinha"
-              value={formData.cardNumber}
-              funcao={(value) => updateFormData('cardNumber', value)}
-              max={20}
-              teclado="numeric"
-              icon={formErrors.cardNumber ? 'card-bulleted-off' : 'card-account-details'}
-              style={getInputStyle('cardNumber')}
-              redicon={formErrors.cardNumber}
-            />
-            <InputTexto
-              text="Plano de Saúde"
-              value={formData.healthPlan}
-              funcao={(value) => updateFormData('healthPlan', value)}
-              max={50}
-              teclado="default"
-              icon={formErrors.healthPlan ? 'hospital-box-outline' : 'hospital-box'}
-              style={getInputStyle('healthPlan')}
-              redicon={formErrors.healthPlan}
-            />
-            <InputTexto
-              text="CNS"
-              value={formData.CNS}
-              funcao={(value) => updateFormData('CNS', value)}
-              max={15}
-              teclado="numeric"
-              icon={formErrors.CNS ? 'card-bulleted-off' : 'card-account-details'}
-              style={getInputStyle('CNS')}
-              redicon={formErrors.CNS}
-            />
-            <InputTexto
-              text="Data de Inclusão (DD/MM/YYYY)"
-              value={formData.dtInclusao}
-              funcao={(value) => updateFormData('dtInclusao', value)}
-              max={10}
-              teclado="numeric"
-              icon={formErrors.dtInclusao ? 'calendar-alert' : 'calendar'}
-              style={getInputStyle('dtInclusao')}
-              redicon={formErrors.dtInclusao}
             />
           </CollapsibleSection>
         </ScrollView>

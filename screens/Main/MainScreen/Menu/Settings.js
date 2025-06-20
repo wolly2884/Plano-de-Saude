@@ -13,8 +13,8 @@ const Menu = ({ navigation }) => {
       <Text style={styles.title}>O que você precisa hoje:</Text>
 
       <View style={styles.rowContainer}>
-        <Botao text={'Alteração de Senha'} nav={'Alteração de Senha'} image={require('../../../../assets/src/senha.png')} />
-        <Botao text={'Alteração do Dados'} nav={'Alteração do Dados'} image={require('../../../../assets/src/dados.png')} />
+        <Botao text={'Alteração da Senha'} nav={'Alteração da Senha'} image={require('../../../../assets/src/senha.png')} />
+        <Botao text={'Alteração de Dados'} nav={'Alteração de Dados'} image={require('../../../../assets/src/dados.png')} />
         <Botao text={'Alteração do Email'} nav={'Alteração do Email'} image={require('../../../../assets/src/email.png')} />
       </View>
 

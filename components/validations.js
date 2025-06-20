@@ -28,12 +28,20 @@ export const formatCEP = (value) => {
 
 // Função para formatar data (ex.: 12/12/2025)
 export const formatDate = (value) => {
+  // Remove todos os caracteres não numéricos e limita a 8 dígitos
   const cleaned = value.replace(/\D/g, '').slice(0, 8);
   if (cleaned.length === 0) return '';
-  return cleaned
-    .replace(/(\d{2})(\d)/, '$1/$2')
-    .replace(/(\d{2})(\d)/, '$1/$2')
-    .replace(/(\d{4})$/, '$1');
+
+  // Formata a entrada diretamente como DD/MM/YYYY
+  let formatted = cleaned;
+  if (cleaned.length > 2) {
+    formatted = cleaned.slice(0, 2) + '/' + cleaned.slice(2);
+  }
+  if (cleaned.length > 4) {
+    formatted = formatted.slice(0, 5) + '/' + formatted.slice(5);
+  }
+
+  return formatted;
 };
 
 // Função para validar e formatar datas (DD/MM/YYYY -> YYYY-MM-DD)

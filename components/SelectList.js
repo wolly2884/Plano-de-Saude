@@ -13,7 +13,7 @@ const SelectLista = ({ data, selectedItem, setSelected, onSelect, isEmpty, place
         <SelectList
           placeholder={'Escolha ' + placeholder}
           data={data}
-          save="value"
+          save="label"
           search={true}
           boxStyles={[styles.dropdown, isEmpty ? styles.dropdownError : {}]}
           inputStyles={styles.dropdownText}

@@ -93,8 +93,8 @@ const App = () => {
             <Stack.Screen name="Extrato Coparticipação" component={ExtraCopart}         options={{ headerShown: true  }} />
             <Stack.Screen name="Extrato Utilização"     component={ExtraUtil}           options={{ headerShown: true  }} />
       
-            <Stack.Screen name="Alteração do Dados"     component={AlterCad}            options={{ headerShown: true  }} />
-            <Stack.Screen name="Alteração de Senha"     component={AlterSenha}          options={{ headerShown: true  }} />
+            <Stack.Screen name="Alteração de Dados"     component={AlterCad}            options={{ headerShown: true  }} />
+            <Stack.Screen name="Alteração da Senha"     component={AlterSenha}          options={{ headerShown: true  }} />
             <Stack.Screen name="Alteração do Email"     component={AlterEmail}          options={{ headerShown: true  }} />
             <Stack.Screen name="Inclusão de Dependente" component={Dependente}          options={{ headerShown: true  }} />
             <Stack.Screen name="Configurações"          component={Setting}             options={{ headerShown: true  }} />

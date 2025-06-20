@@ -28,33 +28,33 @@ export default function App() {
   const styles = getStyles(theme);
   
   const estados = [
-    { value: 'AC', label: 'Acre' },
-    { value: 'AL', label: 'Alagoas' },
-    { value: 'AP', label: 'Amapá' },
-    { value: 'AM', label: 'Amazonas' },
-    { value: 'BA', label: 'Bahia' },
-    { value: 'CE', label: 'Ceará' },
-    { value: 'DF', label: 'Distrito Federal' },
-    { value: 'ES', label: 'Espírito Santo' },
-    { value: 'GO', label: 'Goiás' },
-    { value: 'MA', label: 'Maranhão' },
-    { value: 'MT', label: 'Mato Grosso' },
-    { value: 'MS', label: 'Mato Grosso do Sul' },
-    { value: 'MG', label: 'Minas Gerais' },
-    { value: 'PA', label: 'Pará' },
-    { value: 'PB', label: 'Paraíba' },
-    { value: 'PR', label: 'Paraná' },
-    { value: 'PE', label: 'Pernambuco' },
-    { value: 'PI', label: 'Piauí' },
-    { value: 'RJ', label: 'Rio de Janeiro' },
-    { value: 'RN', label: 'Rio Grande do Norte' },
-    { value: 'RS', label: 'Rio Grande do Sul' },
-    { value: 'RO', label: 'Rondônia' },
-    { value: 'RR', label: 'Roraima' },
-    { value: 'SC', label: 'Santa Catarina' },
-    { value: 'SP', label: 'São Paulo' },
-    { value: 'SE', label: 'Sergipe' },
-    { value: 'TO', label: 'Tocantins' },
+    { id: 'AC', value: 'Acre'                , label: 'Acre'                },
+    { id: 'AL', value: 'Alagoas'             , label: 'Alagoas'             },
+    { id: 'AP', value: 'Amapá'               , label: 'Amapá'               },
+    { id: 'AM', value: 'Amazonas'            , label: 'Amazonas'            },
+    { id: 'BA', value: 'Bahia'               , label: 'Bahia'               },
+    { id: 'CE', value: 'Ceará'               , label: 'Ceará'               },
+    { id: 'DF', value: 'Distrito Federal'    , label: 'Distrito Federal'    },
+    { id: 'ES', value: 'Espírito Santo'      , label: 'Espírito Santo'      },
+    { id: 'GO', value: 'Goiás'               , label: 'Goiás'               },
+    { id: 'MA', value: 'Maranhão'            , label: 'Maranhão'            },
+    { id: 'MT', value: 'Mato Grosso'         , label: 'Mato Grosso'         },
+    { id: 'MS', value: 'Mato Grosso do Sul'  , label: 'Mato Grosso do Sul'  },
+    { id: 'MG', value: 'Minas Gerais'        , label: 'Minas Gerais'        },
+    { id: 'PA', value: 'Pará'                , label: 'Pará'                },
+    { id: 'PB', value: 'Paraíba'             , label: 'Paraíba'             },
+    { id: 'PR', value: 'Paraná'              , label: 'Paraná'              },
+    { id: 'PE', value: 'Pernambuco'          , label: 'Pernambuco'          },
+    { id: 'PI', value: 'Piauí'               , label: 'Piauí'               },
+    { id: 'RJ', value: 'Rio de Janeiro'      , label: 'Rio de Janeiro'      },
+    { id: 'RN', value: 'Rio Grande do Norte' , label: 'Rio Grande do Norte' },
+    { id: 'RS', value: 'Rio Grande do Sul'   , label: 'Rio Grande do Sul'   },
+    { id: 'RO', value: 'Rondônia'            , label: 'Rondônia'            },
+    { id: 'RR', value: 'Roraima'             , label: 'Roraima'             },
+    { id: 'SC', value: 'Santa Catarina'      , label: 'Santa Catarina'      },
+    { id: 'SP', value: 'São Paulo'           , label: 'São Paulo'           },
+    { id: 'SE', value: 'Sergipe'             , label: 'Sergipe'             },
+    { id: 'TO', value: 'Tocantins'           , label: 'Tocantins'           },
   ];
 
   const establishmentTypes = [
@@ -114,9 +114,12 @@ export default function App() {
     filtrarMedicos();
   }, [selectEstado, neighborhood, selectedSpecialties, results]);
 
-  const searchNeighborhood = async (value) => {
-    setSelectEstado(value);
-    // Reset all relevant fields when changing state
+  const searchNeighborhood = async (props) => {
+    const idEstado = estados.find((e) => e.label === props);
+    let id = idEstado ? idEstado.id : id;
+
+    setSelectEstado(id);
+    
     setNeighborhood('');
     setEstablishmentType('');
     setSelectedSpecialties([]);
@@ -133,7 +136,7 @@ export default function App() {
     setError(null);
 
     try {
-      const res = await api.get(`/Medico/estado/${value}`);
+      const res = await api.get(`/Medico/estado/${id}`);
       const data = res.data.rows || res.data.data || [];
 
       const newResults = data.map((b) => {

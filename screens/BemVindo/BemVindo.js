@@ -13,7 +13,8 @@ export default function BemVindo() {
   const progress = useRef(new Animated.Value(0)).current;
   const fadeAnim = useRef(new Animated.Value(1)).current;
   const navigation = useNavigation();
-  const [authenticated, setAuthenticated] = useState(false); // Novo estado
+  const [authenticated, setAuthenticated] = useState(false);
+  const [hasTriggeredBiometric, setHasTriggeredBiometric] = useState(false); // Novo estado
   const { theme } = useTheme();
   const styles = getStyles(theme);
 
@@ -38,7 +39,7 @@ export default function BemVindo() {
 
       if (result.success) {
         await AsyncStorage.setItem('biometricConfigured', 'true');
-        setAuthenticated(true); // Marca como autenticado
+        setAuthenticated(true);
         navigation.navigate('pagina'); // Navega para a página principal
       } else if (result.error === 'user_cancel') {
         await AsyncStorage.removeItem('biometricConfigured');
@@ -58,31 +59,31 @@ export default function BemVindo() {
       const savedToken = await AsyncStorage.getItem('ID');
       const biometricFlag = await AsyncStorage.getItem('biometricConfigured');
 
-      if (savedToken !== null) {
-        if (biometricFlag === 'true') {
-          await authenticateUser(savedToken);
-        } else {
-          navigation.navigate('Home');
-        }
+      if (savedToken !== null && biometricFlag === 'true') {
+        // Não dispara autenticação imediatamente, espera o countdown chegar a 5s
+        return { savedToken, biometricFlag: true };
       } else {
         navigation.navigate('Home');
+        return { savedToken: null, biometricFlag: false };
       }
     } catch (e) {
       Alert.alert('Erro', 'Falha ao verificar autenticação. Redirecionando...');
       navigation.navigate('Home');
+      return { savedToken: null, biometricFlag: false };
     }
   }, [navigation]);
 
   useFocusEffect(
     useCallback(() => {
-      checkTokenAndAuthenticate();
-    }, [checkTokenAndAuthenticate])
+      if (!authenticated && !hasTriggeredBiometric) {
+        checkTokenAndAuthenticate();
+      }
+    }, [checkTokenAndAuthenticate, authenticated, hasTriggeredBiometric])
   );
 
   useEffect(() => {
-    if (authenticated) {
-      // Se autenticado, para a animação e countdown
-      progress.stopAnimation();
+    if (authenticated || hasTriggeredBiometric) {
+      // Para a animação e countdown se autenticado ou biometria já disparada
       return;
     }
 
@@ -93,11 +94,22 @@ export default function BemVindo() {
     });
     progressAnimation.start();
 
+    let tokenData = null;
+    checkTokenAndAuthenticate().then((data) => {
+      tokenData = data;
+    });
+
     const interval = setInterval(() => {
       setCountdown((prev) => {
+        if (prev === 5 && tokenData?.savedToken && tokenData?.biometricFlag && !hasTriggeredBiometric) {
+          setHasTriggeredBiometric(true);
+          authenticateUser(tokenData.savedToken); // Dispara autenticação aos 5 segundos
+        }
         if (prev === 1) {
           clearInterval(interval);
-          fadeOutAndNavigate();
+          if (!authenticated && !hasTriggeredBiometric) {
+            fadeOutAndNavigate();
+          }
         }
         return prev - 1;
       });
@@ -105,12 +117,12 @@ export default function BemVindo() {
 
     return () => {
       clearInterval(interval);
-      progress.stopAnimation();
+      progressAnimation.stop();
     };
-  }, [authenticated]);
+  }, [authenticated, hasTriggeredBiometric, checkTokenAndAuthenticate]);
 
   const fadeOutAndNavigate = () => {
-    if (authenticated) return; // Se autenticado, não navega para Home
+    if (authenticated) return;
 
     Animated.timing(fadeAnim, {
       toValue: 0,
@@ -155,4 +167,3 @@ function AnimatedProgress({ progress }) {
     <Progress.Bar progress={animatedProgress} width={200} color="#1E90FF" animated />
   );
 }
-
