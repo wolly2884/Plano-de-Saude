@@ -5,8 +5,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Rodape from '../../../../../components/Rodape';
-import InputTexto from '../../../../../components/InputTexto';
-import SelectBeneficiario from '../../../../../components/SelectBeneficiario';
+import InputTexto from '../../../../../components/InputTexto1';
 import api from '../../../../../api/api';
 import { getStyles } from './styles';
 import { useTheme } from '../../../../../context/ThemeContext';
@@ -22,16 +21,12 @@ export default function FinanceDashboard({ navigation }) {
   const scrollX = useRef(new Animated.Value(0)).current;
 
   const [beneficiarios, setBeneficiarios] = useState([]);
-  const [selectedItem, setSelectedItem] = useState('');
-  const [selectedCpf, setSelectedCpf] = useState('');
   const [ano, setAno] = useState('');
   const [mes, setMes] = useState('');
   const [selectedCards, setSelectedCards] = useState([]);
   const [index, setIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(false);
-  const [showCards, setShowCards] = useState(false);
-  const [beneficiaryName, setBeneficiaryName] = useState('');
   const [familyTotalBalance, setFamilyTotalBalance] = useState('0.00');
   const [id, setId] = useState('');
 

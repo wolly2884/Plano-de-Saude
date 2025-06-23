@@ -1,94 +1,105 @@
-import React, { useEffect, useState } from 'react';
-import MapView, { Marker, Callout } from 'react-native-maps';
-import {  View, Text, TouchableOpacity } from 'react-native';
+import React, { use, useState, useEffect } from 'react';
+import {
+  View,
+  Text,
+  ActivityIndicator,
+  StyleSheet,
+  Alert,
+  Pressable,
+} from 'react-native';
 import * as Location from 'expo-location';
-import {styles } from './styles'
-import { searchPlacesAPI } from '../../../../api/api_rede_credenciada'; // Importando a função da API
+import axios from 'axios';
+import MapaEmbed from '../../../../components/WebMaps'; // Importe corretamente
 
 export default function App() {
   const [location, setLocation] = useState(null);
-  const [errorMsg, setErrorMsg] = useState(null);
-  const [places, setPlaces] = useState([]);
+  const [locais, setLocais] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    (async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        setErrorMsg('Permissão para acessar negada');
-        return;
-      }
+  const montarConsultaOverpass = (latitude, longitude, radius = 3000) => {
+    return `
+      [out:json];
+      (
+        node["amenity"="hospital"](around:${radius},${latitude},${longitude});
+        node["amenity"="unimed"](around:${radius},${latitude},${longitude});
+        node["amenity"="hospitalar"](around:${radius},${latitude},${longitude});
+        node["amenity"="clinic"](around:${radius},${latitude},${longitude});
+        node["amenity"="doctors"](around:${radius},${latitude},${longitude});
+        node["amenity"="healthcare"](around:${radius},${latitude},${longitude});
+      );
+      out center;
+    `;
+  };
 
-      let location = await Location.getCurrentPositionAsync({
-        accuracy: Location.Accuracy.High,
-      });
-      setLocation(location);
-    })();
-  }, []);
-
-  const searchPlaces = async () => {
+  const buscarLocais = async () => {
+    setLoading(true);
     try {
-      if (!location) {
-        console.error('Localização não encontrada');
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permissão negada');
+        setLoading(false);
         return;
       }
 
-      const latitude = location.coords.latitude;
-      const longitude = location.coords.longitude;
+      const local = await Location.getCurrentPositionAsync({});
+      setLocation(local.coords);
 
-      const parsedPlaces = await searchPlacesAPI(latitude, longitude, 'hospital');
-      setPlaces(parsedPlaces);
-    } catch (error) {
-      console.error('Erro ao buscar locais:', error);
+      const query = montarConsultaOverpass(local.coords.latitude, local.coords.longitude, 13000);
+
+      const response = await axios.post('https://overpass-api.de/api/interpreter', query, {
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      });
+
+      const locaisEncontrados = response.data.elements.map((el) => ({
+        lat: el.lat,
+        lng: el.lon,
+        label: el.tags?.name || 'Local de saúde',
+      }));
+
+      // Adiciona também a localização do usuário como marcador azul
+      locaisEncontrados.unshift({
+        lat: local.coords.latitude,
+        lng: local.coords.longitude,
+        label: 'Você está aqui',
+      });
+
+      setLocais(locaisEncontrados);
+    } catch (e) {
+      Alert.alert('Erro ao buscar locais');
+    } finally {
+      setLoading(false);
     }
   };
 
-  let latitude = null;
-  let longitude = null;
-
-  if (location) {
-    latitude = location.coords.latitude;
-    longitude = location.coords.longitude;
-  }
+  useEffect(() => {
+    buscarLocais();
+  }, []);
 
   return (
-    <View style={{width: '100%', height: '103%'}}>
-      {latitude && longitude && (
-        <MapView 
-          style={styles.RCmap}
-          initialRegion={{
-            latitude: latitude,
-            longitude: longitude,
-            latitudeDelta: 0.0922,
-            longitudeDelta: 0.0421,
-          }}
-        >
-          {places.map(place => (
-            <Marker
-              key={place.id}
-              coordinate={{
-                latitude: place.geometry.location.lat,
-                longitude: place.geometry.location.lng,
-              }}
-              title={place.name}
-              onPress={() => {
-                console.log(`Lugar seleciondo ${place.name}`);
-              }}
-            >
-              <Callout>
-                <Text>{place.name}</Text>
-                <Text>Endereço : {place.vicinity}</Text>
-              </Callout>
-            </Marker>
-          ))}
-        </MapView>
+    <View style={styles.container}>
+      {loading && <ActivityIndicator size="large" color="blue" style={{ marginTop: 10 }} />}
+
+      {locais.length > 0 ? (
+        <MapaEmbed locais={locais} />
+      ) : (
+        <Text style={styles.infoText}>Busque sua localização para exibir o mapa.</Text>
       )}
-      
-      <View style={[styles.RCsearchContainer,{top: 85, right: 90}]}>
-        <TouchableOpacity onPress={searchPlaces}>
-        <Text style={styles.RCTexto}>Buscar Hopitais</Text>
-        </TouchableOpacity>
-      </View>
-      {!location && <Text>{errorMsg ? errorMsg : 'Buscando...'}</Text>}
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: { flex: 1 },
+  infoText: { textAlign: 'center', marginTop: 20 },
+  botaoBusca: {
+    backgroundColor: '#007bff',
+    padding: 10,
+    borderRadius: 8,
+    margin: 10,
+    alignItems: 'center',
+  },
+  botaoTexto: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+});

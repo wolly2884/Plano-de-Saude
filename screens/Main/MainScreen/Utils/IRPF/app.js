@@ -5,7 +5,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Rodape from '../../../../../components/Rodape';
-import InputTexto from '../../../../../components/InputTexto';
+import InputTexto from '../../../../../components/InputTexto1';
 import api from '../../../../../api/api';
 import { getStyles } from './styles';
 import { useTheme } from '../../../../../context/ThemeContext';
@@ -248,14 +248,12 @@ export default function FinanceDashboard({ navigation }) {
           )}
 
           <View style={styles.actions}>
+            
             <TouchableOpacity onPress={handleSubmit} style={styles.actionButton}>
               <Ionicons name="card-outline" size={24} color={theme.inputTextColor} />
               <Text style={styles.actionText}>Gerar Boleto</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.actionButton}>
-              <Ionicons name="arrow-down-circle-outline" size={24} color={theme.inputTextColor} />
-              <Text style={styles.actionText}>Pagar Via Pix</Text>
-            </TouchableOpacity>
+
           </View>
         </ScrollView>
       </View>

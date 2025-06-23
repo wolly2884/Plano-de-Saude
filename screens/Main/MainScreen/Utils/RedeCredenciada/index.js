@@ -1,15 +1,21 @@
+// App.js
 import React, { useState, useEffect } from 'react';
-import { View, Text,  ScrollView, TouchableOpacity, Alert } from 'react-native';
+import {
+  View,
+  Text,
+  ScrollView,
+  TouchableOpacity,
+  Alert
+} from 'react-native';
 import SelectLista from '../../../../../components/SelectList';
-import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 import api from '../../../../../api/api';
+import MapaEmbed from '../../../../../components/WebMaps'; // ajuste o caminho se necessário
 import { getStyles } from './styles';
 import { useTheme } from '../../../../../context/ThemeContext';
 
 export default function App() {
   const [endereco, setEndereco] = useState('');
-  const [coordenadas, setCoordenadas] = useState(null);
   const [error, setError] = useState(null);
   const [selectEstado, setSelectEstado] = useState('');
   const [selectEspecialidade, setSelectEspecialidade] = useState([]);
@@ -24,9 +30,10 @@ export default function App() {
   });
   const [neighborhoods, setNeighborhoods] = useState([]);
   const [neighborhood, setNeighborhood] = useState('');
+  const [marcadores, setMarcadores] = useState([]);
   const { theme } = useTheme();
   const styles = getStyles(theme);
-  
+
   const estados = [
     { id: 'AC', value: 'Acre'                , label: 'Acre'                },
     { id: 'AL', value: 'Alagoas'             , label: 'Alagoas'             },
@@ -81,8 +88,6 @@ export default function App() {
             cd_especialidade: item.cd_especialidade,
           }))
         );
-      } else {
-        setSelectEspecialidade([]);
       }
     } catch (error) {
       console.error('Error fetching especialidade:', error);
@@ -115,28 +120,22 @@ export default function App() {
   }, [selectEstado, neighborhood, selectedSpecialties, results]);
 
   const searchNeighborhood = async (props) => {
-    const idEstado = estados.find((e) => e.label === props);
-    let id = idEstado ? idEstado.id : id;
+    const idEstado = estados.find((e) => e.label === props)?.id;
+    setSelectEstado(idEstado);
 
-    setSelectEstado(id);
-    
     setNeighborhood('');
     setEstablishmentType('');
     setSelectedSpecialties([]);
     setResults([]);
     setFilteredResults([]);
-    setSpecialtiesByType({
-      diagnostic: [],
-      hospital: [],
-      clinic: [],
-    });
+    setSpecialtiesByType({ diagnostic: [], hospital: [], clinic: [] });
     setNeighborhoods([]);
-    setCoordenadas(null);
     setEndereco('');
     setError(null);
+    setMarcadores([]);
 
     try {
-      const res = await api.get(`/Medico/estado/${id}`);
+      const res = await api.get(`/Medico/estado/${idEstado}`);
       const data = res.data.rows || res.data.data || [];
 
       const newResults = data.map((b) => {
@@ -160,16 +159,10 @@ export default function App() {
 
       data.forEach((item) => {
         if (item.ds_establishmenttypes && item.cd_especialidade) {
-          if (!newSpecialties[item.ds_establishmenttypes]) {
-            newSpecialties[item.ds_establishmenttypes] = [];
-          }
-
           const espec = selectEspecialidade.find(
             (c) => c.cd_especialidade === item.cd_especialidade
           );
-
           const nomeEspecialidade = espec?.ds_especialidade || '';
-
           if (!newSpecialties[item.ds_establishmenttypes].includes(nomeEspecialidade)) {
             newSpecialties[item.ds_establishmenttypes].push(nomeEspecialidade);
           }
@@ -177,11 +170,25 @@ export default function App() {
       });
 
       setSpecialtiesByType(newSpecialties);
+
+      // Geolocalização dos médicos
       if (newResults.length > 0) {
-        const resGeo = await api.post('/geolocalizar', {
-          endereco: newResults[0].address,
-        });
-        setCoordenadas(resGeo.data);
+        const geoMarcadores = await Promise.all(
+          newResults.map(async (res) => {
+            try {
+              const geo = await api.post('/geolocalizar', { endereco: res.address });
+              return {
+                lat: geo.data.latitude,
+                lng: geo.data.longitude,
+                label: res.name,
+              };
+            } catch {
+              return null;
+            }
+          })
+        );
+
+        setMarcadores(geoMarcadores.filter(Boolean));
       }
     } catch (err) {
       console.error(err);
@@ -189,12 +196,17 @@ export default function App() {
     }
   };
 
-  const buscarEndereco = async (address) => {
+  const buscarEndereco = async (address, nome = '') => {
     try {
       const res = await api.post('/geolocalizar', { endereco: address });
-
-      setCoordenadas(res.data);
       setEndereco(address);
+      setMarcadores([
+        {
+          lat: res.data.lat,
+          lng: res.data.lng,
+          label: nome || address,
+        },
+      ]);
     } catch (err) {
       console.error(err);
       setError('Erro ao buscar localização do endereço');
@@ -211,8 +223,15 @@ export default function App() {
 
       let location = await Location.getCurrentPositionAsync({});
       const { latitude, longitude } = location.coords;
-      setCoordenadas({ latitude, longitude });
+
       setEndereco('Localização atual');
+      setMarcadores([
+        {
+          lat: latitude,
+          lng: longitude,
+          label: 'Você está aqui',
+        },
+      ]);
     } catch (err) {
       Alert.alert('Erro', 'Erro ao obter localização atual: ' + err.message);
     }
@@ -222,7 +241,6 @@ export default function App() {
     <View style={styles.container}>
       <View style={styles.sidebar}>
         <View style={styles.filterContainer}>
-          <Text style={styles.title}></Text>
           <SelectLista
             data={estados}
             selectedItem={selectEstado}
@@ -231,7 +249,6 @@ export default function App() {
             isEmpty={estados.length === 0}
             placeholder="Selecione o Estado"
           />
-
           <SelectLista
             data={neighborhoods.map((nb) => ({ label: nb, value: nb }))}
             selectedItem={neighborhood}
@@ -240,7 +257,6 @@ export default function App() {
             isEmpty={neighborhoods.length === 0 && error}
             placeholder="Cidades disponíveis"
           />
-
           <SelectLista
             data={establishmentTypes}
             selectedItem={establishmentType}
@@ -252,7 +268,6 @@ export default function App() {
             isEmpty={establishmentTypes.length === 0}
             placeholder="o Estabelecimento"
           />
-
           {establishmentType && (
             <SelectLista
               data={specialtiesByType[establishmentType]
@@ -273,7 +288,7 @@ export default function App() {
             <TouchableOpacity
               key={idx}
               style={styles.resultItem}
-              onPress={() => buscarEndereco(res.address)}
+              onPress={() => buscarEndereco(res.address, res.name)}
             >
               <Text style={styles.resultName}>{res.name}</Text>
               <Text style={styles.resultAddress}>{res.address}</Text>
@@ -287,24 +302,8 @@ export default function App() {
       </View>
 
       <View style={styles.mapContainer}>
-        {coordenadas ? (
-          <MapView
-            style={styles.map}
-            region={{
-              latitude: coordenadas.latitude || coordenadas.lat || 0,
-              longitude: coordenadas.longitude || coordenadas.lng || 0,
-              latitudeDelta: 0.01,
-              longitudeDelta: 0.01,
-            }}
-          >
-            <Marker
-              coordinate={{
-                latitude: coordenadas.latitude || coordenadas.lat || 0,
-                longitude: coordenadas.longitude || coordenadas.lng || 0,
-              }}
-              title={endereco}
-            />
-          </MapView>
+        {marcadores.length > 0 ? (
+          <MapaEmbed locais={marcadores} />
         ) : (
           <Text style={styles.noMapText}>Nenhum local selecionado</Text>
         )}

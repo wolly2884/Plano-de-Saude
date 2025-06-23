@@ -1,26 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Text, View, ScrollView } from 'react-native';
 import moment from 'moment';
-import 'moment/locale/pt-br';
-import { LocaleConfig } from 'react-native-calendars';
-import Date from './date'; // Componente visual para um dia
+import './calendarLocale'; 
+import Date from './date';
 import { useTheme } from '../context/ThemeContext';
-import { getStyles } from './Styles_calendar'; // Importa seu style com suporte a tema
-
-
-// Configuração de localidade
-LocaleConfig.locales['pt-br'] = {
-  monthNames: [
-    'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
-    'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
-  ],
-  monthNamesShort: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
-  dayNames: ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'],
-  dayNamesShort: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'],
-  today: 'Hoje',
-};
-LocaleConfig.defaultLocale = 'pt-br';
-moment.locale('pt-br');
+import { getStyles } from './Styles_calendar';
 
 const Calendar = ({ onSelectDate, selected }) => {
   const [dates, setDates] = useState([]);

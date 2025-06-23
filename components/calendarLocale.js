@@ -1,5 +1,7 @@
 // calendarLocale.js
 import { LocaleConfig } from 'react-native-calendars';
+import moment from 'moment';
+import 'moment/locale/pt-br';
 
 LocaleConfig.locales['pt-br'] = {
   monthNames: [
@@ -13,3 +15,4 @@ LocaleConfig.locales['pt-br'] = {
 };
 
 LocaleConfig.defaultLocale = 'pt-br';
+moment.locale('pt-br');

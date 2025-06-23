@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
-import { View, Text, StyleSheet, Animated, Alert, Platform } from 'react-native';
+import { View, Text, Animated, Platform } from 'react-native';
 import LottieView from 'lottie-react-native';
 import * as Progress from 'react-native-progress';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
@@ -7,6 +7,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as LocalAuthentication from 'expo-local-authentication';
 import { useTheme } from '../../context/ThemeContext';
 import { getStyles } from './styles';
+import api from '../../api/api';
+import { EMPRESA_EMAIL } from '@env';
 
 export default function BemVindo() {
   const [countdown, setCountdown] = useState(10);
@@ -14,11 +16,43 @@ export default function BemVindo() {
   const fadeAnim = useRef(new Animated.Value(1)).current;
   const navigation = useNavigation();
   const [authenticated, setAuthenticated] = useState(false);
-  const [hasTriggeredBiometric, setHasTriggeredBiometric] = useState(false); // Novo estado
+  const [hasTriedBiometric, setHasTriedBiometric] = useState(false);
   const { theme } = useTheme();
   const styles = getStyles(theme);
 
-  const authenticateUser = async (savedToken) => {
+  const checkEmpresaAccess = async (email) => {
+    try {
+      const response = await api.get(`/Token/find/${email}`);
+
+      // Extrai o primeiro item do array rows
+      const empresa = response.data?.rows?.[0];
+
+      if (!empresa) {
+        // Se não encontrou dados da empresa, bloqueia acesso
+        navigation.replace('AcessoNegado');
+        return false;
+      }
+
+      // Salva os dados da empresa no AsyncStorage
+      await AsyncStorage.setItem('EmpresaUser', JSON.stringify(empresa));
+
+      // Verifica se dt_valid é uma data futura (válida)
+      const dtValid = new Date(empresa.dt_valid);
+      const agora = new Date();
+
+      if (dtValid > agora) {
+        return true; // Empresa válida
+      } else {
+        navigation.replace('AcessoNegado');
+        return false; // Empresa com acesso expirado
+      }
+    } catch (error) {
+      navigation.replace('AcessoNegado');
+      return false;
+    }
+  };
+
+  const authenticateUser = async () => {
     try {
       const hasHardware = await LocalAuthentication.hasHardwareAsync();
       if (!hasHardware) throw new Error('Seu dispositivo não suporta biometria.');
@@ -40,15 +74,12 @@ export default function BemVindo() {
       if (result.success) {
         await AsyncStorage.setItem('biometricConfigured', 'true');
         setAuthenticated(true);
-        navigation.navigate('pagina'); // Navega para a página principal
-      } else if (result.error === 'user_cancel') {
+        navigation.navigate('pagina');
+      } else {
         await AsyncStorage.removeItem('biometricConfigured');
         navigation.navigate('Home');
-      } else {
-        throw new Error('Autenticação biométrica falhou.');
       }
     } catch (error) {
-      Alert.alert('Erro de Autenticação', error.message);
       await AsyncStorage.removeItem('biometricConfigured');
       navigation.navigate('Home');
     }
@@ -58,56 +89,61 @@ export default function BemVindo() {
     try {
       const savedToken = await AsyncStorage.getItem('ID');
       const biometricFlag = await AsyncStorage.getItem('biometricConfigured');
+      const empresaTemAcesso = await checkEmpresaAccess(EMPRESA_EMAIL);
+
+      if (!empresaTemAcesso) {
+        return { savedToken: null, biometricFlag: false };
+      }
 
       if (savedToken !== null && biometricFlag === 'true') {
-        // Não dispara autenticação imediatamente, espera o countdown chegar a 5s
+
+        const empresaTemAcesso = await checkEmpresaAccess(EMPRESA_EMAIL);
+
+        if (!empresaTemAcesso) {
+          return { savedToken: null, biometricFlag: false };
+        }
         return { savedToken, biometricFlag: true };
       } else {
         navigation.navigate('Home');
         return { savedToken: null, biometricFlag: false };
       }
     } catch (e) {
-      Alert.alert('Erro', 'Falha ao verificar autenticação. Redirecionando...');
       navigation.navigate('Home');
       return { savedToken: null, biometricFlag: false };
     }
   }, [navigation]);
 
+  // Use focus effect para chamar a verificação quando a tela ganhar foco
   useFocusEffect(
     useCallback(() => {
-      if (!authenticated && !hasTriggeredBiometric) {
-        checkTokenAndAuthenticate();
+      if (!authenticated && !hasTriedBiometric) {
+        (async () => {
+          const data = await checkTokenAndAuthenticate();
+          if (data.savedToken && data.biometricFlag) {
+            setHasTriedBiometric(true);
+            authenticateUser();
+          }
+        })();
       }
-    }, [checkTokenAndAuthenticate, authenticated, hasTriggeredBiometric])
+    }, [checkTokenAndAuthenticate, authenticated, hasTriedBiometric])
   );
 
   useEffect(() => {
-    if (authenticated || hasTriggeredBiometric) {
-      // Para a animação e countdown se autenticado ou biometria já disparada
-      return;
-    }
+    if (authenticated) return;
 
     const progressAnimation = Animated.timing(progress, {
       toValue: 1,
       duration: 10000,
       useNativeDriver: false,
     });
+    
     progressAnimation.start();
-
-    let tokenData = null;
-    checkTokenAndAuthenticate().then((data) => {
-      tokenData = data;
-    });
 
     const interval = setInterval(() => {
       setCountdown((prev) => {
-        if (prev === 5 && tokenData?.savedToken && tokenData?.biometricFlag && !hasTriggeredBiometric) {
-          setHasTriggeredBiometric(true);
-          authenticateUser(tokenData.savedToken); // Dispara autenticação aos 5 segundos
-        }
         if (prev === 1) {
           clearInterval(interval);
-          if (!authenticated && !hasTriggeredBiometric) {
+          if (!authenticated) {
             fadeOutAndNavigate();
           }
         }
@@ -119,7 +155,7 @@ export default function BemVindo() {
       clearInterval(interval);
       progressAnimation.stop();
     };
-  }, [authenticated, hasTriggeredBiometric, checkTokenAndAuthenticate]);
+  }, [authenticated]);
 
   const fadeOutAndNavigate = () => {
     if (authenticated) return;
@@ -139,8 +175,7 @@ export default function BemVindo() {
 
       <LottieView
         source={{
-          uri:
-            'https://lottie.host/58adf468-8d4b-48fc-99c0-61c1da62b117/QVrTc3FY63.lottie',
+          uri: 'https://lottie.host/58adf468-8d4b-48fc-99c0-61c1da62b117/QVrTc3FY63.lottie',
         }}
         autoPlay
         loop

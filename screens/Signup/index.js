@@ -137,7 +137,6 @@ const App = ({ navigation }) => {
         formattedValue = value.toUpperCase();
         break;
     }
-    console.log(`Atualizando ${field}: Raw: ${value}, Formatted: ${formattedValue}`);
     setFormData((prev) => ({ ...prev, [field]: formattedValue }));
     if (formErrors[field]) {
       setFormErrors((prev) => ({ ...prev, [field]: false }));

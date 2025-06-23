@@ -22,6 +22,7 @@ const SelectBeneficiario = ({ selectedItem, setSelectedItem, onSelect, isEmpty }
       }
       const userData = await api.get(`/Beneficiario/get_t/${storedID}`);
       const { rowCount, rows } = userData.data;
+
       if (rowCount > 0) {
         const user = rows[0];
         await AsyncStorage.setItem('user', JSON.stringify(user));

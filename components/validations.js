@@ -28,6 +28,19 @@ export const formatCEP = (value) => {
 
 // Função para formatar data (ex.: 12/12/2025)
 export const formatDate = (value) => {
+ 
+  // Se já estiver no formato brasileiro, retorna como está
+  if (/^\d{2}\/\d{2}\/\d{4}$/.test(value)) return value;
+
+  if ( value.length > 10){
+    const partes = value.slice(0,10).split('-');
+    console.log('partes', partes)
+  if (partes.length !== 3) return value;
+
+  const [ano, mes, dia] = partes;
+  return `${dia}/${mes}/${ano}`;
+  } 
+
   // Remove todos os caracteres não numéricos e limita a 8 dígitos
   const cleaned = value.replace(/\D/g, '').slice(0, 8);
   if (cleaned.length === 0) return '';
@@ -93,22 +106,16 @@ export const validateFields = (formData, setFormErrors) => {
   const errors = {};
   const requiredFields = [
     'nmBeneficiario',
-    'CPF',
-    'password',
     'age',
     'estadoCivil',
     'sexo',
-    'Email',
     'celular',
     'logradouro',
     'numero',
     'cidade',
     'CEP',
     'estado',
-    'cardNumber',
-    'healthPlan',
     'CNS',
-    'dtInclusao',
   ];
 
   requiredFields.forEach((field) => {
@@ -117,9 +124,6 @@ export const validateFields = (formData, setFormErrors) => {
     }
   });
 
-  if (formData.CPF && !cpf.isValid(formData.CPF)) {
-    errors.CPF = true;
-  }
   if (formData.password && formData.password.length < 6) {
     errors.password = true;
   }
@@ -142,13 +146,7 @@ export const validateFields = (formData, setFormErrors) => {
     errors.estado = true;
   }
 
-  // Validação específica para datas
-  if (formData.age && !validateAndFormatDate(formData.age, 'age', setFormErrors)) {
-    errors.age = true;
-  }
-  if (formData.dtInclusao && !validateAndFormatDate(formData.dtInclusao, 'dtInclusao', setFormErrors)) {
-    errors.dtInclusao = true;
-  }
+  console.log('errors', errors)
 
   setFormErrors(errors);
   return Object.keys(errors).length === 0;

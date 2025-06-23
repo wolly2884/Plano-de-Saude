@@ -109,7 +109,6 @@ export default function App({ route, navigation }) {
   };
 
   const openWhatsApp = () => {
-    console.log('teste', ben);
     let url = 'whatsapp://send?';
     let text = 'text=Olá!' + med.Nome + '\nTitular : ' + ben.Nome + '\nDigite aqui sua mensagem : ';
     let fone = '&phone=+5513981375296';

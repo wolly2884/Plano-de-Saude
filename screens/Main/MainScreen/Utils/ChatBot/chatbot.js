@@ -13,14 +13,15 @@ import {
   Alert,
 } from 'react-native';
 
-import { SelectList } from 'react-native-dropdown-select-list';
 import { useTheme } from '../../../../../context/ThemeContext';
-import InputTexto from '../../../../../components/InputTexto';
+import InputTexto from '../../../../../components/InputTexto1';
 import Rodape from '../../../../../components/Rodape';
 import { getStyles } from './chatstyle';
 import enioEmail from '../../../../../assets/enioemail.png';
 import SelectBeneficiario from '../../../../../components/SelectBeneficiario';
+import SelectLista from '../../../../../components/SelectList';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import api from '../../../../../api/api';
 
 // Opções de feedback
 const feedbackOptions = [
@@ -30,16 +31,14 @@ const feedbackOptions = [
   { key: '4', value: 'Outros' },
 ];
 
- 
-
 // Componente de input reutilizável
-const FormInput = ({ field, label, value, onChange, icon, max, teclado, multiline, numberOfLines, inputRef, onFocus, styles, errors, theme }) => (
+const FormInput = ({ field, label, value, onChange, icon, max, teclado, multiline, numberOfLines, inputRef, onFocus, styles, errors, theme, editar = true }) => (
   <View style={styles.section}>
     <InputTexto
       text={label}
       value={value}
       funcao={onChange}
-      editar={true}
+      editar={editar}
       icon={icon}
       placeholderTextColor={theme.placeholderColor}
       max={max}
@@ -71,8 +70,6 @@ const App = ({ navigation }) => {
     messageInputY: 0,
   });
   const [selectedBeneficiary, setSelectedBeneficiary] = useState(null);
-  const [beneficiaries, setBeneficiaries] = useState([]);
-  const [selectedFile, setSelectedFile] = useState(null);
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [isEmailEdited, setIsEmailEdited] = useState(false);
@@ -86,14 +83,25 @@ const App = ({ navigation }) => {
 
   useFocusEffect(
     useCallback(() => {
-      async function fetchUserData() {
+      const fetchUserData = async () => {
         try {
-          const user = await AsyncStorage.getItem('user');
-          setNmTitular(user ? JSON.parse(user).nm_beneficiario : '');
-        } catch (error) {
-          console.error('Error fetching user data:', error);
+          const storedID = await AsyncStorage.getItem('ID');
+          if (!storedID) {
+            console.log('No stored ID for user data fetch');
+            return;
+          }
+          const userData = await api.get(`/Beneficiario/get_t/${storedID}`);
+          const { rowCount, rows } = userData.data;
+
+          if (rowCount > 0) {
+            const user = rows[0];
+            await AsyncStorage.setItem('user', JSON.stringify(user));
+            setNmTitular(user?.nm_beneficiario || 'Titular da Familia');
+          }
+        } catch (userError) {
+          console.error('Error fetching user data:', userError.message);
         }
-      }
+      };
 
       fetchUserData();
     }, [])
@@ -141,10 +149,6 @@ const App = ({ navigation }) => {
         formDataToSend.append('feedbackType', cleanString(formData.feedbackType));
         formDataToSend.append('cpf', cleanString(formData.cpf));
 
-        // Simulação de envio para API
-        // await api.post('/submit', formDataToSend);
-
-        Alert.alert('Sucesso', 'Formulário enviado com sucesso!', [{ text: 'OK' }]);
         navigation.navigate('Chat Live', {
           message: cleanString(formData.message),
           name: cleanString(formData.nome),
@@ -183,6 +187,12 @@ const App = ({ navigation }) => {
 
   // Manipulação de mudança de input
   const handleInputChange = useCallback((field, value) => {
+    
+    if (field === 'feedbackType'){
+      const param = feedbackOptions.find(c => c.key === value )
+      value = param.value || 'Outros';
+    }
+ 
     setFormData((prev) => ({ ...prev, [field]: value }));
     setErrors((prev) => ({ ...prev, [field]: null }));
   }, []);
@@ -197,7 +207,7 @@ const App = ({ navigation }) => {
       carteirinha: cleanString(beneficiary?.cd_cardnumber),
       email: cleanString(beneficiary?.ds_email),
       cpf: cleanString(beneficiary?.cd_cpf),
-      titular: cleanString(nm_titular),
+      titular: cleanString(nm_titular || beneficiary?.nm_beneficiario),
     }));
 
     setErrors((prev) => ({ ...prev, beneficiary: null, carteirinha: null, email: null, cpf: null }));
@@ -239,25 +249,13 @@ const App = ({ navigation }) => {
           )}
 
           <View style={styles.section}>
-            <SelectList
-              dropdownStyles={styles.dropdownStyles}
-              placeholder="Selecione o tipo de feedback"
-              setSelected={(val) => handleInputChange('feedbackType', val)}
+            <SelectLista
               data={feedbackOptions}
-              save="value"
-              search={true}
-              boxStyles={[styles.dropdown, errors.feedbackType ? styles.dropdownError : {}]}
-              inputStyles={styles.dropdownText}
-              dropdownTextStyles={styles.dropdownText}
-              placeholderStyle={styles.dropdownPlaceholder}
-              accessibilityLabel="Selecionar tipo de feedback"
-              accessibilityRole="combobox"
+              setSelected={(val) => handleInputChange('feedbackType', val)}
+              isEmpty={errors.feedbackType}
+              placeholder='feedback'
             />
-            {errors.feedbackType && (
-              <Text style={styles.errorMessage} accessibilityLabel={errors.feedbackType}>
-                {errors.feedbackType}
-              </Text>
-            )}
+
           </View>
 
           <View style={styles.section}>
@@ -287,12 +285,12 @@ const App = ({ navigation }) => {
             errors={errors}
             theme={theme}
             accessibilityLabel="Digite o email"
+            editar={false}
           />
           <FormInput
             field="titular"
             label="Titular"
             value={formData.titular}
-            onChange={(text) => handleInputChange('titular', text)}
             icon="account"
             max={50}
             teclado="default"
@@ -300,6 +298,7 @@ const App = ({ navigation }) => {
             errors={errors}
             theme={theme}
             accessibilityLabel="Digite o nome do titular"
+            editar={false}
           />
           <FormInput
             field="carteirinha"
@@ -313,6 +312,7 @@ const App = ({ navigation }) => {
             errors={errors}
             theme={theme}
             accessibilityLabel="Digite o número da carteirinha"
+            editar={false}
           />
           <FormInput
             field="cpf"
@@ -326,6 +326,7 @@ const App = ({ navigation }) => {
             errors={errors}
             theme={theme}
             accessibilityLabel="Digite o CPF"
+            editar={false}
           />
           <FormInput
             field="message"

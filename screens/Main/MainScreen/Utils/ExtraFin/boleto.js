@@ -17,8 +17,8 @@ const App = ({ route, navigation }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [boletoImage] = useState('https://banco.bradesco/erro-404/assets/img/logo.svg');
-    const { theme } = useTheme();
-    const styles = getStyles(theme);
+  const { theme } = useTheme();
+  const styles = getStyles(theme);
   const [boletoData, setBoletoData] = useState({
     Vencimento: '',
     Local_de_Pagamento: 'Pagável em qualquer banco até o vencimento, após somente no banco emissor.',

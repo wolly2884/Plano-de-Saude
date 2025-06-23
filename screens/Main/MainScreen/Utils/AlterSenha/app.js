@@ -8,7 +8,7 @@ import {
   SafeAreaView
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import InputTexto from '../../../../../components/InputTexto';
+import InputTexto from '../../../../../components/InputTexto1';
 import Rodape from '../../../../../components/Rodape';
 import api from '../../../../../api/api';
 import { useTheme } from '../../../../../context/ThemeContext';

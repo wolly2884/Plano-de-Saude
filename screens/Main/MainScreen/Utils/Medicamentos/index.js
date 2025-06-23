@@ -190,7 +190,7 @@ const Agenda = ({ navigation }) => {
         if (selectedItem) {
             setbenef(selectedItem); // Atualiza o estado com o objeto selecionado
         } else {
-            console.log('Item não encontrado para o valor:', selectedValue);
+            console.error('Item não encontrado para o valor:', selectedValue);
         }
     };
 
@@ -203,7 +203,7 @@ const Agenda = ({ navigation }) => {
         if (selespecItem) {
             setespec(selespecItem); // Atualiza o estado com o objeto selecionado
         } else {
-            console.log('Item não encontrado para o valor:', selectedValue);
+            console.error('Item não encontrado para o valor:', selectedValue);
         }
     };
     
@@ -216,7 +216,7 @@ const Agenda = ({ navigation }) => {
         if (selmedcItem) {
             setmedic(selmedcItem); // Atualiza o estado com o objeto selecionado
         } else {
-            console.log('Item não encontrado para o valor:', selmedcItem);
+            console.error('Item não encontrado para o valor:', selmedcItem);
         }
     };
 
@@ -229,7 +229,7 @@ const Agenda = ({ navigation }) => {
         if (selectedAtendimento) {
             setatend(selectedAtendimento); // Update selected atendimento
         } else {
-            console.log('Atendimento item not found for value:', selectedValue.value);
+            console.error('Atendimento item not found for value:', selectedValue.value);
             return;
         }
 
@@ -241,7 +241,7 @@ const Agenda = ({ navigation }) => {
         if (newMedico.length > 0) {
             SetMedico(newMedico);
         } else {
-            console.log('Nenhum medicamento encontrado para o tipo:', selectedValue);
+            console.error('Nenhum medicamento encontrado para o tipo:', selectedValue);
         }
     };
             

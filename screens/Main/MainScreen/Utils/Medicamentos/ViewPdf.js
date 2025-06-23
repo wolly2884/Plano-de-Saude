@@ -23,7 +23,7 @@ const App = ({ route }) => {
     const fetchProductData = async () => {
       try {
         const response = await axios.get(
-          `http://www.sara.com.br/api/products/search`,
+          `https://www.sara.com.br/api/products/search`,
           {
             params: {
               q: medicamento,
@@ -42,8 +42,8 @@ const App = ({ route }) => {
           Alert.alert('Error', 'No product URL found for the provided medication.');
         }
       } catch (error) {
-        console.error('Axios error:', error.message, error.response?.data);
-        Alert.alert('Error', 'Failed to fetch product data. Please try again later.');
+        console.error('Axios error:', error.message + " -- " +  error.response?.data);
+        Alert.alert('Error', 'Failed to fetch product data. Please try again later.' + " -- " +  error.message + " -- " +  error.response?.data);
       } finally {
         setLoading(false);
       }

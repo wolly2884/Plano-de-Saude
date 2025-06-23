@@ -3,7 +3,7 @@ import {TouchableOpacity, Text, Linking, ScrollView, SafeAreaView, Image} from '
 import * as MailComposer from 'expo-mail-composer';
 import {styles} from './Styles'
 import { SelectList } from 'react-native-dropdown-select-list'
-import InputTexto from '../../../../../components/InputTexto';
+import InputTexto from '../../../../../components/InputTexto1';
 import Rodape  from '../../../../../components/Rodape'
 
 import { useFocusEffect } from '@react-navigation/native';

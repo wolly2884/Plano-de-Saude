@@ -1,13 +1,10 @@
 {
   "expo": {
-    "name": "Plano de Saúde",
+    "name": "Plano de Facil",
     "slug": "snack-6bc4847f-cafe-4021-b372-e585f14f170e",
-    "version": "1.0.0",
+    "version": "1.0.2",
     "orientation": "portrait",
-    "platforms": [
-      "ios",
-      "android"
-    ],
+    "platforms": ["ios", "android"],
     "userInterfaceStyle": "automatic",
     "icon": "./assets/icon.png",
     "splash": {
@@ -15,31 +12,27 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true
     },
     "android": {
+      "edgeToEdgeEnabled": true,
+      "fabricEnabled": false,
+      "jsEngine": "hermes",
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon.png",
         "backgroundColor": "#ffffff"
       },
       "permissions": [
-        "CAMERA",
-        "RECORD_AUDIO",
-        "camera",
-        "android.permission.READ_EXTERNAL_STORAGE",
-        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.READ_MEDIA_IMAGES",
+        "android.permission.READ_MEDIA_VIDEO",
+        "android.permission.READ_MEDIA_AUDIO",
         "android.permission.CAMERA",
         "android.permission.RECORD_AUDIO",
         "android.permission.ACCESS_FINE_LOCATION",
         "android.permission.ACCESS_COARSE_LOCATION",
         "android.permission.ACCESS_BACKGROUND_LOCATION",
-        "android.permission.READ_MEDIA_IMAGES",
-        "android.permission.READ_MEDIA_VIDEO",
-        "android.permission.READ_MEDIA_AUDIO",
         "android.permission.ACCESS_MEDIA_LOCATION",
         "android.permission.POST_NOTIFICATIONS",
         "android.permission.ACCESS_NOTIFICATION_POLICY",
@@ -56,10 +49,10 @@
         "android.permission.READ_PHONE_STATE",
         "android.permission.USE_FULL_SCREEN_INTENT",
         "android.permission.REQUEST_INSTALL_PACKAGES",
-        "android.permission.WRITE_SETTINGS",
-        "mediaLibrary"
+        "android.permission.WRITE_SETTINGS"
       ],
-      "package": "com.anderson_tome.snack6bc4847fcafe4021b372e585f14f170e"
+      "package": "com.andersontome.planodesaude",
+      "versionCode": 1
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -70,14 +63,12 @@
       }
     },
     "plugins": [
-      [
-        "expo-local-authentication",
-        {
-          "faceIDPermissionPrompt": "Allow $(PRODUCT_NAME) to use Face ID"
-        }
-      ],
+      "expo-system-ui",
+      ["expo-local-authentication", { "faceIDPermissionPrompt": "Allow $(PRODUCT_NAME) to use Face ID" }],
       "expo-web-browser",
-      "expo-mail-composer"
+      "expo-mail-composer",
+      "expo-media-library",
+      "expo-location"
     ]
   }
 }

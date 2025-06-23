@@ -8,15 +8,15 @@ import * as MediaLibrary from 'expo-media-library';
 import * as IntentLauncher from 'expo-intent-launcher';
 import { getStyles } from './styles';
 import { useTheme } from '../../../../../context/ThemeContext';
-import { AntDesign } from '@expo/vector-icons';
 import Rodape from '../../../../../components/Rodape';
+import api from '../../../../../api/api';
 
 const App = ({ route, navigation }) => {
   const [folderName, setFolderName] = useState('');
   const [selectedFolder, setSelectedFolder] = useState('Boletos');
   const [folders, setFolders] = useState(['Boletos', 'Downloads']);
   const [isLoading, setIsLoading] = useState(false);
-  const boletoImage = 'https://banco.bradesco/erro-404/assets/img/logo.svg';
+  const boletoImage = 'https://nodestart.onrender.com/assets/logo.jpg';
   const { theme } = useTheme();
   const styles = getStyles(theme);
 

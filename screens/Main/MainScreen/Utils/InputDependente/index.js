@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getStyles } from './Styles';
-import InputTexto from '../../../../../components/InputTexto';
+import InputTexto from '../../../../../components/InputTexto1';
 import Rodape from '../../../../../components/Rodape';
 import api from '../../../../../api/api';
 import { useTheme } from '../../../../../context/ThemeContext';
@@ -151,7 +151,6 @@ const App = ({ navigation }) => {
         formattedValue = value.toUpperCase();
         break;
     }
-    console.log(`Atualizando ${field}: Raw: ${value}, Formatted: ${formattedValue}`);
     setFormData((prev) => ({ ...prev, [field]: formattedValue }));
     if (formErrors[field]) {
       setFormErrors((prev) => ({ ...prev, [field]: false }));
